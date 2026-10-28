@@ -79,4 +79,71 @@ const registerUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser };
+
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Find user by email
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
+
+        // Compare entered password with stored hash
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
+
+        // Regenerate session ID after authentication
+        req.session.regenerate((error) => {
+            if (error) {
+                console.error("Session regeneration failed:", error);
+                return res.status(500).json({
+                    message: "Unable to complete login"
+                });
+            }
+
+            // Store authenticated user's ID
+            req.session.userId = user._id.toString();
+
+            req.session.save((error) => {
+                if (error) {
+                    console.error("Session save failed:", error);
+                    return res.status(500).json({
+                        message: "Unable to complete login"
+                    });
+                }
+
+                return res.status(200).json({
+                    message: "Login successful",
+                    user: {
+                        id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        role: user.role
+                    }
+                });
+            });
+        });
+
+    } catch (error) {
+        console.error("Login error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
+
+module.exports = { registerUser, loginUser };

@@ -1,10 +1,10 @@
-
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
 
 const authRoutes = require("./routes/authRoutes");
+const createSessionMiddleware = require("./config/session");
 
 const app = express();
 
@@ -13,6 +13,7 @@ app.disable("x-powered-by");
 app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: "10kb" }));
+app.use(createSessionMiddleware());
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
