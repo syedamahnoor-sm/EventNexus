@@ -146,4 +146,58 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser };
+
+const logoutUser = (req, res) => {
+    req.session.destroy((error) => {
+        if (error) {
+            console.error("Logout error:", error);
+
+            return res.status(500).json({
+                message: "Unable to logout"
+            });
+        }
+
+        res.clearCookie("eventnexus.sid", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/"
+        });
+
+        return res.status(200).json({
+            message: "Logout successful"
+        });
+    });
+};
+
+
+const getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId)
+            .select("name email role");
+
+        if (!user) {
+            return res.status(401).json({
+                message: "User account no longer exists"
+            });
+        }
+
+        return res.status(200).json({
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+        console.error("Get current user error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
+
+module.exports = { registerUser, loginUser, logoutUser, getCurrentUser };
