@@ -171,33 +171,17 @@ const logoutUser = (req, res) => {
 };
 
 
-const getCurrentUser = async (req, res) => {
-    try {
-        const user = await User.findById(req.session.userId)
-            .select("name email role");
+const getCurrentUser = (req, res) => {
+    const user = req.user;
 
-        if (!user) {
-            return res.status(401).json({
-                message: "User account no longer exists"
-            });
+    return res.status(200).json({
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
         }
-
-        return res.status(200).json({
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            }
-        });
-
-    } catch (error) {
-        console.error("Get current user error:", error);
-
-        return res.status(500).json({
-            message: "Internal server error"
-        });
-    }
+    });
 };
 
 module.exports = { registerUser, loginUser, logoutUser, getCurrentUser };
