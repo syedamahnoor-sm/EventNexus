@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const errorHandler = require("./middleware/errorHandler");
 const createSessionMiddleware = require("./config/session");
 const { verifyCsrfToken } = require("./middleware/csrf");
+const eventRoutes = require("./routes/eventRoutes");
 
 const app = express();
 
@@ -32,6 +33,8 @@ const authLimiter = rateLimit({
 });
 
 app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/events", eventRoutes);
+
 app.use(errorHandler);
 
 module.exports = app;
