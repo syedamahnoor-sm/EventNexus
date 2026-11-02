@@ -6,6 +6,7 @@ const { registerSchema, loginSchema } = require("../validators/authValidation");
 const validate = require("../middleware/validate");
 const requireAuth = require("../middleware/requireAuth")
 const requireRole = require("../middleware/requireRole");
+const { generateCsrfToken } = require("../middleware/csrf");
 
 router.post("/register", validate(registerSchema), registerUser);
 router.post("/login", validate(loginSchema), loginUser);
@@ -21,5 +22,10 @@ router.get(
         });
     }
 );
+router.get("/csrf-token", generateCsrfToken, (req, res) => {
+    res.status(200).json({
+        csrfToken: req.session.csrfToken
+    });
+});
 
 module.exports = router;

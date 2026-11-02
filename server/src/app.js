@@ -6,6 +6,7 @@ const { rateLimit } = require("express-rate-limit");
 const authRoutes = require("./routes/authRoutes");
 const errorHandler = require("./middleware/errorHandler");
 const createSessionMiddleware = require("./config/session");
+const { verifyCsrfToken } = require("./middleware/csrf");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: "10kb" }));
 app.use(createSessionMiddleware());
+app.use(verifyCsrfToken);
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,

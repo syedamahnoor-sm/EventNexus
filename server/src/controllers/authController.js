@@ -1,6 +1,6 @@
-
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const crypto = require("node:crypto");
 
 const registerUser = async (req, res) => {
     try {
@@ -80,6 +80,7 @@ const registerUser = async (req, res) => {
 };
 
 
+
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -93,7 +94,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Compare entered password with stored hash
+        // Compare password with stored hash
         const isPasswordValid = await bcrypt.compare(
             password,
             user.password
@@ -105,21 +106,29 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Regenerate session ID after authentication
+        // Regenerate session to prevent session fixation
         req.session.regenerate((error) => {
             if (error) {
                 console.error("Session regeneration failed:", error);
+
                 return res.status(500).json({
                     message: "Unable to complete login"
                 });
             }
 
-            // Store authenticated user's ID
+            // Store authenticated user ID
             req.session.userId = user._id.toString();
 
+            // Generate a fresh CSRF token for the new session
+            req.session.csrfToken = crypto
+                .randomBytes(32)
+                .toString("hex");
+
+            // Save the new session in MongoDB
             req.session.save((error) => {
                 if (error) {
                     console.error("Session save failed:", error);
+
                     return res.status(500).json({
                         message: "Unable to complete login"
                     });
@@ -132,7 +141,8 @@ const loginUser = async (req, res) => {
                         name: user.name,
                         email: user.email,
                         role: user.role
-                    }
+                    },
+                    csrfToken: req.session.csrfToken
                 });
             });
         });
@@ -145,6 +155,7 @@ const loginUser = async (req, res) => {
         });
     }
 };
+
 
 
 const logoutUser = (req, res) => {
