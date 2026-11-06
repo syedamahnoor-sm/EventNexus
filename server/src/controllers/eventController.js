@@ -1,8 +1,6 @@
 const Event = require("../models/Event");
-const { createEventSchema } = require("../validators/eventValidator");
 const mongoose = require("mongoose")
 
-const Event = require("../models/Event");
 const { createEventSchema, updateEventSchema } = require("../validators/eventValidator");
 
 const createEvent = async (req, res, next) => {
@@ -35,54 +33,144 @@ const createEvent = async (req, res, next) => {
 };
 
 
+
 const getAllEvents = async (req, res, next) => {
     try {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
+        const {
+            search,
+            category,
+            period,
+            status,
+            sort = "soonest"
+        } = req.query;
 
-        if (
-            !Number.isInteger(page) ||
-            page < 1 ||
-            !Number.isInteger(limit) ||
-            limit < 1 ||
-            limit > 50
-        ) {
+        // Strict pagination
+        const parsePositiveInteger = (value, fallback, max) => {
+            if (value === undefined) return fallback;
+
+            const text = String(value);
+
+            if (!/^[1-9]\d*$/.test(text)) return null;
+
+            const number = Number(text);
+
+            if (!Number.isSafeInteger(number) || number > max) {
+                return null;
+            }
+
+            return number;
+        };
+
+        const page = parsePositiveInteger(req.query.page, 1, 1000000);
+        const limit = parsePositiveInteger(req.query.limit, 12, 50);
+
+        if (page === null || limit === null) {
             return res.status(400).json({
                 message: "Invalid pagination parameters"
             });
         }
 
-        const skip = (page - 1) * limit;
+        const categories = [
+            "Technology",
+            "Workshops",
+            "Competitions",
+            "Career",
+            "Community",
+            "Other"
+        ];
 
-        // Optional filtering by event status
-        const filter = {};
+        if (category && !categories.includes(category)) {
+            return res.status(400).json({
+                message: "Invalid event category"
+            });
+        }
 
-        if (req.query.status) {
-            const allowedStatuses = [
-                "upcoming",
-                "cancelled",
-                "completed"
-            ];
+        if (status && !["upcoming", "cancelled", "completed"].includes(status)) {
+            return res.status(400).json({
+                message: "Invalid event status"
+            });
+        }
 
-            if (!allowedStatuses.includes(req.query.status)) {
+        if (period && !["week", "month"].includes(period)) {
+            return res.status(400).json({
+                message: "Invalid date period"
+            });
+        }
+
+        if (!["soonest", "latest"].includes(sort)) {
+            return res.status(400).json({
+                message: "Invalid sort option"
+            });
+        }
+
+        const filter = {
+            status: status || "upcoming"
+        };
+
+        if (category) {
+            filter.category = category;
+        }
+
+        // Search across event information
+        if (search) {
+            if (typeof search !== "string" || search.length > 100) {
                 return res.status(400).json({
-                    message: "Invalid event status"
+                    message: "Invalid search query"
                 });
             }
 
-            filter.status = req.query.status;
+            const escapedSearch = search.trim().replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+            );
+
+            if (escapedSearch) {
+                filter.$or = [
+                    { title: { $regex: escapedSearch, $options: "i" } },
+                    { description: { $regex: escapedSearch, $options: "i" } },
+                    { location: { $regex: escapedSearch, $options: "i" } }
+                ];
+            }
         }
 
-        // Fetch matching events
-        const events = await Event.find(filter)
-            .populate("organizer", "name email")
-            .sort({ date: 1, _id: 1 })
-            .skip(skip)
-            .limit(limit)
-            .lean();
+        // Filter events by date
+        const now = new Date();
 
-        // Count total matching events
-        const total = await Event.countDocuments(filter);
+        if (filter.status === "upcoming") {
+            filter.date = { $gte: now };
+        }
+
+        if (period) {
+            const end = new Date(now);
+
+            if (period === "week") {
+                end.setDate(end.getDate() + 7);
+            } else {
+                end.setMonth(end.getMonth() + 1);
+            }
+
+            filter.date = {
+                ...(filter.date || {}),
+                $gte: now,
+                $lt: end
+            };
+        }
+
+        const skip = (page - 1) * limit;
+
+        const [events, total] = await Promise.all([
+            Event.find(filter)
+                .populate("organizer", "name")
+                .sort({
+                    date: sort === "soonest" ? 1 : -1,
+                    _id: 1
+                })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+
+            Event.countDocuments(filter)
+        ]);
 
         return res.status(200).json({
             message: "Events fetched successfully",
@@ -91,7 +179,8 @@ const getAllEvents = async (req, res, next) => {
                 page,
                 limit,
                 total,
-                totalPages: Math.ceil(total / limit)
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total
             }
         });
 
@@ -99,6 +188,7 @@ const getAllEvents = async (req, res, next) => {
         next(error);
     }
 };
+
 
 const getEventById = async (req, res, next) => {
     try {

@@ -9,7 +9,15 @@ const createEventSchema = z.strictObject({
 
     date: z.iso.datetime({ offset: true }),
 
-    capacity: z.number().int().min(1)
+    capacity: z.number().int().min(1),
+    category: z.enum([
+        "Technology",
+        "Workshops",
+        "Competitions",
+        "Career",
+        "Community",
+        "Other"
+    ]).default("Other"),
 });
 
 const updateEventSchema = createEventSchema.partial().refine(

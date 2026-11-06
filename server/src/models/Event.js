@@ -17,6 +17,20 @@ const eventSchema = new mongoose.Schema(
             maxlength: 2000
         },
 
+        category: {
+            type: String,
+            enum: [
+                "Technology",
+                "Workshops",
+                "Competitions",
+                "Career",
+                "Community",
+                "Other"
+            ],
+            required: true,
+            default: "Other"
+        },
+
         location: {
             type: String,
             required: true,
@@ -68,5 +82,9 @@ const eventSchema = new mongoose.Schema(
 
 eventSchema.index({ organizer: 1, date: 1 });
 eventSchema.index({ date: 1 });
-
+eventSchema.index({
+    category: 1,
+    status: 1,
+    date: 1
+});
 module.exports = mongoose.model("Event", eventSchema);
