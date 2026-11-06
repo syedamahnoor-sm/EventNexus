@@ -1,0 +1,91 @@
+/* Reading focus, not navigation: keep the original editorial grid and its spacing. */
+.journey-steps .journey-step {
+  position: relative;
+  isolation: isolate;
+  cursor: default;
+  transition: color 300ms var(--ease-editorial);
+}
+.journey-step:before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -14px;
+  z-index: -1;
+  background: var(--ink);
+  opacity: 0;
+  transition: opacity 320ms var(--ease-editorial);
+  pointer-events: none;
+}
+.journey-step:first-child:before { left: -12px; }
+.journey-step:after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 26px;
+  height: 2px;
+  background: var(--lime);
+  opacity: 0;
+  transform: translateX(-50%) scaleX(.5);
+  transition: opacity 250ms, transform 350ms var(--ease-editorial);
+  pointer-events: none;
+}
+.journey-steps .journey-step h3 {
+  transition: translate 350ms var(--ease-editorial), color 300ms;
+}
+.journey-steps .journey-step p {
+  transition: translate 400ms var(--ease-editorial), color 300ms;
+}
+.journey-step > div > span { transition: color 250ms; }
+.journey-step > div { transition: color 250ms; }
+.journey-step > div > svg { transition: translate 350ms var(--ease-editorial), color 250ms; }
+
+/* Keyboard and touch focus use the same visual treatment; no button/link semantics. */
+.journey-steps .journey-step:focus { color: var(--paper); }
+.journey-step:focus:before { opacity: 1; }
+.journey-steps .journey-step:focus p { color: #d5ded2; translate: 0 -2px; }
+.journey-steps .journey-step:focus h3 { translate: 0 -3px; }
+.journey-step:focus > div { color: var(--lime); }
+.journey-steps .journey-step:focus > div > svg { visibility: visible; translate: 3px -3px; }
+.journey-step:focus:after { opacity: 1; transform: translateX(-50%) scaleX(1); }
+.journey-step:focus-visible { outline: 2px solid var(--terra); outline-offset: 5px; }
+.journey-step:focus:not(:focus-visible) { outline: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .journey-steps .journey-step:hover { color: var(--paper); }
+  .journey-step:hover:before { opacity: 1; }
+  .journey-steps .journey-step:hover p { color: #d5ded2; translate: 0 -2px; }
+  .journey-steps .journey-step:hover h3 { translate: 0 -3px; }
+  .journey-step:hover > div { color: var(--lime); }
+  .journey-steps .journey-step:hover > div > svg { visibility: visible; translate: 3px -3px; }
+  .journey-step:hover:after {
+    opacity: 1;
+    transform: translateX(calc(-50% + var(--pointer-x, 0) * 50px)) scaleX(1);
+  }
+}
+
+/* Existing observer unobserves after the first entrance; heading/arrow reveals stay intact. */
+.journey-steps[data-in-view=true] > .journey-step {
+  animation: journey-column-arrive 550ms var(--ease-editorial) both;
+  animation-delay: var(--step-delay, 0ms);
+}
+.journey-step:nth-child(2) { --step-delay: 80ms; }
+.journey-step:nth-child(3) { --step-delay: 160ms; }
+.journey-step:nth-child(4) { --step-delay: 240ms; }
+/* Interacting immediately must never wait for a delayed entrance. */
+.journey-steps[data-in-view=true] > .journey-step:focus-within { animation: none; }
+@keyframes journey-column-arrive {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 760px) {
+  .journey-step:nth-child(3):before { left: -12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-steps[data-in-view=true] > .journey-step { animation: none; }
+  .journey-steps .journey-step h3,
+  .journey-steps .journey-step p,
+  .journey-steps .journey-step > div > svg { translate: none; }
+  .journey-step:after { transition: none; transform: translateX(-50%) !important; }
+  .journey-step, .journey-step:before, .journey-step h3,
+  .journey-step p, .journey-step > div > svg { transition: none !important; }
+}

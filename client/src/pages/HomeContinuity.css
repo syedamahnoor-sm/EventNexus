@@ -1,0 +1,46 @@
+/* Campus continuity: an offset index and a shared seam; other boundaries stay quiet. */
+.home-page .noticeboard { position: relative; }
+.noticeboard-bridge { position: absolute; top: -11px; right: 0; display: flex; align-items: center; gap: 18px; height: 36px; padding: 0 14px; background: var(--paper); border-top: 2px solid var(--terra); font-size: 8px; letter-spacing: .1em; }
+.noticeboard-bridge > span:first-child { font-family: var(--display); font-size: 22px; letter-spacing: 0; }
+.noticeboard-bridge > svg { width: 15px; height: 15px; }
+.noticeboard-title { display: inline-block; }
+.noticeboard .section-heading[data-in-view=true] .noticeboard-title { animation: noticeboard-impression 750ms var(--ease-editorial) both; }
+@keyframes noticeboard-impression {
+  from { clip-path: inset(0 0 100% 0); transform: translateY(14px); }
+  to { clip-path: inset(0); transform: translateY(0); }
+}
+.home-page .interests { position: relative; }
+/* Only the right shoulder rises: paper remains visible on the opposite side. */
+.home-page .interests:before { content: ''; position: absolute; right: 0; top: -20px; width: 58%; height: 21px; background: var(--ink); pointer-events: none; }
+.surface-seam { position: absolute; left: 0; right: 0; bottom: -21px; display: flex; align-items: center; gap: 22px; pointer-events: none; }
+.surface-seam > span:first-child { display: block; background: var(--ink); color: var(--lime); font-size: 8px; letter-spacing: .13em; padding: 10px 16px; white-space: nowrap; }
+.seam-rule { height: 1px; background: var(--sage); flex: 1; transform-origin: left; }
+.seam-mark { display: grid; place-items: center; background: var(--sage); color: var(--ink); width: 50px; height: 50px; flex-shrink: 0; }
+.seam-mark .brand-mark { width: 34px; height: 34px; }
+.surface-seam[data-in-view=true] .seam-rule { animation: seam-extend 1000ms var(--ease-editorial) both; }
+@keyframes seam-extend { from { transform: scaleX(.1); } to { transform: scaleX(1); } }
+/* A shallow paper cut connects the quieter journey to the existing final arrow. */
+.home-page .closing { position: relative; }
+.home-page .closing:before { content: ''; position: absolute; left: 0; top: -1px; width: clamp(100px, 23vw, 340px); height: 20px; background: var(--paper); clip-path: polygon(0 0, 100% 0, calc(100% - 20px) 100%, 0 100%); pointer-events: none; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-page .interests { view-timeline-name: --campus-connection; view-timeline-axis: block; }
+    .seam-mark .brand-mark { animation: seam-turn linear both; animation-timeline: --campus-connection; animation-range: entry 10% exit 90%; }
+    @keyframes seam-turn { from { transform: translateY(-5px) rotate(-12deg); } to { transform: translateY(5px) rotate(12deg); } }
+  }
+}
+@media (max-width: 760px) {
+  .noticeboard-bridge { height: 30px; gap: 12px; font-size: 7px; top: -8px; padding-inline: 10px; }
+  .noticeboard-bridge > span:first-child { font-size: 19px; }
+  .home-page .interests:before { height: 13px; top: -12px; width: 42%; }
+  .surface-seam { gap: 12px; bottom: -18px; }
+  .surface-seam > span:first-child { font-size: 7px; padding: 9px 12px; }
+  .seam-mark { width: 42px; height: 42px; }
+  .seam-mark .brand-mark { width: 29px; height: 29px; }
+  .home-page .closing:before { height: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .noticeboard .section-heading[data-in-view=true] .noticeboard-title, .surface-seam[data-in-view=true] .seam-rule { animation: none; }
+  .noticeboard-title { clip-path: none; transform: none; }
+  .seam-rule, .seam-mark .brand-mark { transform: none; }
+}

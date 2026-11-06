@@ -4,6 +4,7 @@ import {
     Route
 } from "react-router-dom";
 
+import MotionShell from "./components/MotionShell";
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
@@ -19,7 +20,7 @@ export default function App() {
         <BrowserRouter>
             <Navbar />
 
-            <Routes>
+            <MotionShell><Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/events/:id" element={<EventDetails />} />
@@ -33,7 +34,7 @@ export default function App() {
                     path="/organizer/dashboard"
                     element={<OrganizerDashboard />}
                 />
-            </Routes>
+            </Routes></MotionShell>
         </BrowserRouter>
     );
 }

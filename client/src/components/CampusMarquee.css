@@ -1,0 +1,41 @@
+/* Both groups have the same width, including their final separator and spacing. */
+.campus-marquee.brand-strip {
+  --marquee-gap: clamp(30px, 4vw, 64px);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  gap: 0;
+  padding: 0;
+  min-height: 68px;
+  isolation: isolate;
+}
+.marquee-window { overflow: hidden; min-width: 0; padding-block: 20px; }
+.marquee-track { display: flex; width: max-content; animation: campus-ribbon 52s linear infinite; }
+.marquee-group { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-around; min-width: calc(100vw - 48px); }
+.marquee-run { display: flex; flex: 0 0 auto; align-items: center; gap: var(--marquee-gap); padding-right: var(--marquee-gap); }
+.marquee-beat { display: flex; flex-shrink: 0; align-items: center; gap: var(--marquee-gap); }
+.marquee-beat b { font-weight: 500; font-size: clamp(10px, .85vw, 13px); letter-spacing: .12em; white-space: nowrap; }
+.campus-marquee .marquee-beat .brand-mark, .marquee-arrow { display: block; flex-shrink: 0; width: 26px; height: 26px; color: var(--lime); }
+.marquee-control { display: grid; place-items: center; align-self: stretch; background: var(--ink); color: var(--lime); border: 0; border-left: 1px solid #f7f6f22b; transition: background 180ms, color 180ms; }
+.marquee-control:is(:hover, :focus-visible) { background: var(--lime); color: var(--ink); }
+.marquee-control:focus-visible { outline: 2px solid var(--paper); outline-offset: -5px; }
+.marquee-control:active svg { transform: scale(.9); }
+.campus-marquee:is(:hover, :focus-within, [data-paused=true]) .marquee-track { animation-play-state: paused; }
+@keyframes campus-ribbon { to { transform: translateX(-50%); } }
+@media (max-width: 760px) {
+  .campus-marquee.brand-strip { min-height: 62px; grid-template-columns: minmax(0, 1fr) 44px; }
+  .marquee-window { padding-block: 18px; }
+  .marquee-group { min-width: calc(100vw - 44px); }
+  .campus-marquee .marquee-beat .brand-mark, .marquee-arrow { width: 24px; height: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campus-marquee.brand-strip { display: block; }
+  .marquee-control, .marquee-group:nth-child(2), .marquee-run:nth-child(2) { display: none; }
+  .marquee-window { padding: 20px; }
+  .marquee-track { animation: none; }
+  .marquee-track, .marquee-group { display: block; width: 100%; min-width: 0; transform: none; }
+  .marquee-run { width: 100%; padding: 0; flex-wrap: wrap; justify-content: center; gap: 16px 24px; }
+  .marquee-beat { gap: 20px; max-width: 100%; flex-shrink: 1; }
+  .marquee-beat b { min-width: 0; white-space: normal; line-height: 1.7; }
+  .campus-marquee .marquee-beat .brand-mark, .marquee-arrow { width: 20px; height: 20px; }
+}
