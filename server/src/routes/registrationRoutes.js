@@ -3,7 +3,8 @@ const express = require("express");
 const {
     registerForEvent,
     cancelRegistration,
-    getMyRegistrations
+    getMyRegistrations,
+    getEventRegistrations
 } = require("../controllers/registrationController");
 
 const requireAuth = require("../middleware/requireAuth");
