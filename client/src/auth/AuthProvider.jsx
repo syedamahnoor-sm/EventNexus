@@ -2,12 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../api/axios';
 import { AuthContext } from './AuthContext';
 import { createAuthClient } from './authClient';
+import { clearOtherProfileDrafts } from '../lib/studentProfile';
 
 const client = createAuthClient(api);
 let sessionRequest;
 function fetchSession() {
   // Share initialization across StrictMode's effect replay and simultaneous consumers.
-  if (!sessionRequest) sessionRequest = api.get('/auth/me', { timeout: 10000 }).finally(() => { sessionRequest = null; });
+  if (!sessionRequest) {
+    const request = api.get('/auth/me', { timeout: 10000 }).finally(() => { if (sessionRequest === request) sessionRequest = null; });
+    sessionRequest = request;
+  }
   return sessionRequest;
 }
 
@@ -18,6 +22,7 @@ export default function AuthProvider({ children }) {
   const busy = useRef(false);
   const channel = useRef(null);
   const lastCheck = useRef(0);
+  useEffect(() => { clearOtherProfileDrafts(session.user?.id); }, [session.user?.id]);
   const restore = useCallback(async () => {
     const version = epoch.current;
     try {
@@ -34,7 +39,7 @@ export default function AuthProvider({ children }) {
     window.addEventListener('focus', refresh);
     if ('BroadcastChannel' in window) {
       channel.current = new BroadcastChannel('eventnexus-session');
-      channel.current.onmessage = () => { client.clear(); epoch.current++; restore(); };
+      channel.current.onmessage = () => { client.clear(); sessionRequest = null; epoch.current++; restore(); };
     }
     const interceptor = api.interceptors.response.use(response => response, error => {
       if (error.response?.status === 401 && error.config?.url !== '/auth/login' && error.config?.url !== '/auth/me') {
@@ -46,6 +51,17 @@ export default function AuthProvider({ children }) {
     });
     return () => { window.removeEventListener('focus', refresh); channel.current?.close(); api.interceptors.response.eject(interceptor); };
   }, [restore]);
+
+  const updateUser = useCallback((user, broadcast = false) => {
+    epoch.current++;
+    setSession(current => {
+      if (current.user?.id !== user.id || current.user?.role !== user.role) return current;
+      if ((current.user.profileVersion || 0) > (user.profileVersion || 0)) return current;
+      return { status: 'ready', user };
+    });
+    lastCheck.current = Date.now();
+    if (broadcast) channel.current?.postMessage('profile-changed');
+  }, []);
 
   async function action(operation, payload) {
     if (busy.current) throw new Error('An authentication request is already in progress');
@@ -64,5 +80,5 @@ export default function AuthProvider({ children }) {
       setPending(false);
     }
   }
-  return <AuthContext.Provider value={{ user: session.user, status: session.status, initializing: session.status === 'loading', authenticated: Boolean(session.user), role: session.user?.role || null, pending, refresh: restore, login: values => action('login', values), register: values => action('register', values), logout: () => action('logout') }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user: session.user, status: session.status, initializing: session.status === 'loading', authenticated: Boolean(session.user), role: session.user?.role || null, pending, refresh: restore, updateUser, login: values => action('login', values), register: values => action('register', values), logout: () => action('logout') }}>{children}</AuthContext.Provider>;
 }

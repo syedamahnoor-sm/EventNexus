@@ -7,6 +7,7 @@ const validate = require("../middleware/validate");
 const requireAuth = require("../middleware/requireAuth")
 const requireRole = require("../middleware/requireRole");
 const { generateCsrfToken } = require("../middleware/csrf");
+router.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 
 router.post("/register", validate(registerSchema), registerUser);
 router.post("/login", validate(loginSchema), loginUser);

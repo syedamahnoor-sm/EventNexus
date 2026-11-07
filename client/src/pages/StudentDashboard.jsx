@@ -43,7 +43,7 @@ function DashboardContent() {
   return <main id="main" tabIndex={-1} className="student-dashboard wrap">
     <header className="student-welcome entrance">
       <div><p className="eyebrow">YOUR EVENTNEXUS / STUDENT DASHBOARD</p><p className="student-greeting">Good to see you, <strong>{user.name}.</strong></p><h1>Your campus,<br /><em>collected.</em></h1><p className="student-intro">The plans you’ve made. The experiences ahead.<br />A little space for your life beyond the classroom.</p></div>
-      <div className="student-welcome-aside"><BrandMark /><span>MAKE ROOM<br />FOR WHAT’S NEXT.</span><Link className="text-link" to="/events">Find your next event <Arrow diagonal /></Link></div>
+      <div className="student-welcome-aside"><BrandMark /><span>MAKE ROOM<br />FOR WHAT’S NEXT.</span><Link className="text-link" to="/events">Find your next event <Arrow diagonal /></Link><Link className="text-link" to="/student/profile">Your student profile <Arrow diagonal /></Link></div>
     </header>
     <nav className="student-section-nav" aria-label="Dashboard sections"><a href="#student-upcoming">01 / Coming up</a><a href="#student-past">02 / Looking back</a><button type="button" onClick={registrations.refresh} disabled={registrations.loading}>{registrations.loading ? 'Refreshing…' : 'Refresh my events'} <Arrow /></button></nav>
     {notice && <p ref={result} tabIndex={-1} data-cancellation-result className="student-result" role="status">{notice}</p>}

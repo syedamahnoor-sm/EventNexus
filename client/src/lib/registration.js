@@ -8,7 +8,7 @@ export const REGISTRATION_FIELDS = [
 ];
 
 export function initialStudentDetails(user) {
-  return { fullName: user?.name || '', email: user?.email || '', studentId: '', department: '', studyStage: '', contactNumber: '' };
+  return { fullName: user?.name || '', email: user?.email || '', studentId: user?.studentProfile?.studentId || '', department: user?.studentProfile?.department || '', studyStage: user?.studentProfile?.studyStage || '', contactNumber: user?.studentProfile?.contactNumber || '' };
 }
 
 export function validateRegistration(values) {

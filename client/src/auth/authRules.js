@@ -32,5 +32,6 @@ export function authDestination(from, role) {
   if (['/', '/events', '/events/past'].includes(pathname) || /^\/events\/[a-f\d]{24}$/i.test(pathname)) return path;
   if (/^\/events\/[a-f\d]{24}\/register$/i.test(pathname) && role === 'student') return path;
   if (pathname === `/${role}/dashboard` && ['student', 'organizer'].includes(role)) return path;
+  if (pathname === '/student/profile' && role === 'student') return path;
   return '/events';
 }

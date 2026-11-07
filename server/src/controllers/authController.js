@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("node:crypto");
+const publicUser = require('../utils/publicUser');
 
 const registerUser = async (req, res) => {
     try {
@@ -55,12 +56,7 @@ const registerUser = async (req, res) => {
         // 7. Return success response
         return res.status(201).json({
             message: "User registered successfully",
-            user: {
-                id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-                role: newUser.role
-            }
+            user: publicUser(newUser)
         });
 
     } catch (error) {
@@ -136,12 +132,7 @@ const loginUser = async (req, res) => {
 
                 return res.status(200).json({
                     message: "Login successful",
-                    user: {
-                        id: user._id,
-                        name: user.name,
-                        email: user.email,
-                        role: user.role
-                    },
+                    user: publicUser(user),
                     csrfToken: req.session.csrfToken
                 });
             });
@@ -186,12 +177,7 @@ const getCurrentUser = (req, res) => {
     const user = req.user;
 
     return res.status(200).json({
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-        }
+        user: publicUser(user)
     });
 };
 

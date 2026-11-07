@@ -12,11 +12,11 @@ export function createAuthClient(api) {
     }).finally(() => { pending = null; });
     return pending;
   }
-  async function mutate(method, path, body = {}) {
+  async function mutate(method, path, body = {}, options = {}) {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const config = { headers: { 'X-CSRF-Token': await csrf() }, timeout: 15000 };
-        const response = method === 'delete' ? await api.delete(path, { ...config, data: body }) : await api.post(path, body, config);
+        const config = { headers: { ...options.headers, 'X-CSRF-Token': await csrf() }, timeout: options.timeout || 15000 };
+        const response = method === 'delete' ? await api.delete(path, { ...config, data: body }) : await api[method](path, body, config);
         if (path === '/auth/login') token = response.data.csrfToken || null;
         if (path === '/auth/logout') clear();
         return response.data;
@@ -31,5 +31,5 @@ export function createAuthClient(api) {
       }
     }
   }
-  return { post: (path, body) => mutate('post', path, body), delete: (path, body) => mutate('delete', path, body), clear };
+  return { post: (path, body, options) => mutate('post', path, body, options), patch: (path, body, options) => mutate('patch', path, body, options), delete: (path, body, options) => mutate('delete', path, body, options), clear };
 }

@@ -17,7 +17,9 @@
     "seed:archive:cleanup": "node scripts/seed-events.js archive-cleanup",
     "seed:archive:verify": "node scripts/seed-events.js archive-verify",
     "test:archive": "node --test scripts/seed-events/archive.test.js",
-    "test:registration": "node --test scripts/registration.test.js"
+    "test:registration": "node --test scripts/registration.test.js",
+    "test:avatars": "node --test scripts/avatar.test.js",
+    "avatars:cleanup": "node scripts/cleanup-avatars.js"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +36,7 @@
     "helmet": "^8.3.0",
     "mongoose": "^9.11.4",
     "nodemon": "^3.1.14",
+    "sharp": "^0.35.5",
     "zod": "^4.6.7"
   }
 }

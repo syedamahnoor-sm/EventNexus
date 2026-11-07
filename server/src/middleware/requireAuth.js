@@ -13,7 +13,7 @@ const requireAuth = async (req, res, next) => {
         }
 
         const user = await User.findById(userId)
-            .select("_id name email role");
+            .select("_id name email role createdAt studentProfile profileVersion profilePhoto");
 
         if (!user) {
             return res.status(401).json({

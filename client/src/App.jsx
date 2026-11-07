@@ -18,6 +18,7 @@ import AccountPlaceholder from './auth/AccountPlaceholder';
 import EventDetails from "./pages/EventDetails";
 import EventRegistrationPage from './pages/EventRegistrationPage';
 import StudentDashboard from './pages/StudentDashboard';
+import StudentProfile from './pages/StudentProfile';
 
 export default function App() {
     return (
@@ -32,6 +33,7 @@ export default function App() {
                 <Route path="/events/:id" element={<EventDetails />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/student/profile" element={<ProtectedRoute role="student"><StudentProfile /></ProtectedRoute>} />
                 <Route
                     path="/student/dashboard"
                     element={<ProtectedRoute role="student"><StudentDashboard /></ProtectedRoute>}
