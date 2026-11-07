@@ -93,6 +93,10 @@ const registerForEvent = async (req, res, next) => {
 
 const cancelRegistration = async (req, res, next) => {
     const { id } = req.params;
+    const expectedId = req.body?.registrationId;
+    if (expectedId !== undefined && !mongoose.isObjectIdOrHexString(expectedId)) {
+        return res.status(400).json({ message: 'Invalid registration reference' });
+    }
 
     if (!mongoose.isObjectIdOrHexString(id)) {
         return res.status(400).json({
@@ -106,7 +110,8 @@ const cancelRegistration = async (req, res, next) => {
             const registration = await Registration.findOneAndDelete(
                 {
                     student: req.user._id,
-                    event: id
+                    event: id,
+                    ...(expectedId ? { _id: expectedId } : {})
                 },
                 { session }
             );
@@ -123,6 +128,8 @@ const cancelRegistration = async (req, res, next) => {
             const event = await Event.findOneAndUpdate(
                 {
                     _id: id,
+                    status: 'upcoming',
+                    date: { $gt: new Date() },
                     registeredCount: { $gt: 0 }
                 },
                 {
@@ -132,9 +139,9 @@ const cancelRegistration = async (req, res, next) => {
             );
 
             if (!event) {
-                throw new Error(
-                    "Unable to release the reserved seat"
-                );
+                const error = new Error('Cancellation is unavailable. The event may have started, ended or been cancelled.');
+                error.status = 409;
+                throw error;
             }
         });
 
@@ -143,8 +150,8 @@ const cancelRegistration = async (req, res, next) => {
         });
 
     } catch (error) {
-        if (error.status === 404) {
-            return res.status(404).json({
+        if (error.status === 404 || error.status === 409) {
+            return res.status(error.status).json({
                 message: error.message
             });
         }
