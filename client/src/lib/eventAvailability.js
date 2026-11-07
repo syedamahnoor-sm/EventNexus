@@ -1,14 +1,20 @@
+export function eventSeats(event) {
+  const capacity = Number.isInteger(event.capacity) && event.capacity > 0 ? event.capacity : null;
+  const countKnown = Number.isInteger(event.registeredCount) && event.registeredCount >= 0;
+  const remaining = capacity === null || !countKnown ? null : Math.max(0, capacity - event.registeredCount);
+  return { capacity, remaining };
+}
+
 /** The server remains authoritative; these states explain eligibility before submission. */
 export function eventAvailability(event, now) {
-  const capacity = Number.isInteger(event.capacity) && event.capacity > 0 ? event.capacity : null;
-  const remaining = capacity === null ? null : Math.max(0, capacity - (event.registeredCount ?? 0));
+  const { capacity, remaining } = eventSeats(event);
   const date = new Date(event.date).getTime();
   let state = 'open';
   if (event.status === 'cancelled') state = 'cancelled';
   else if (event.status === 'completed') state = 'completed';
   else if (!Number.isFinite(date)) state = 'unconfirmed';
   else if (date <= now) state = 'past';
-  else if (capacity === null || event.status !== 'upcoming') state = 'unconfirmed';
+  else if (remaining === null || event.status !== 'upcoming') state = 'unconfirmed';
   else if (remaining === 0) state = 'full';
   const messages = {
     open: ['Registration open', 'A place for your curiosity. Join this campus experience.'],

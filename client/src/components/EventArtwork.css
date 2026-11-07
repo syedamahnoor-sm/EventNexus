@@ -1,0 +1,28 @@
+/* Local, fixed-ratio photography replaces only the artwork area. */
+.event-art.event-art--photo {
+  padding: 0;
+  height: auto;
+  aspect-ratio: 8 / 5;
+}
+.event-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 650ms var(--ease-editorial);
+}
+.event-card:focus-within .event-photo { transform: scale(1.035); }
+@media (hover: hover) and (pointer: fine) {
+  .event-card:hover .event-photo,
+  .details-poster:hover .event-photo {
+    transform: scale(1.035) translate(calc(var(--pointer-x, 0) * -5px), calc(var(--pointer-y, 0) * -4px));
+  }
+}
+.event-art.details-art.event-art--photo { height: auto; aspect-ratio: 8 / 5; }
+@media (prefers-reduced-motion: reduce) {
+  .event-photo,
+  .event-card:is(:hover, :focus-within) .event-photo,
+  .details-poster:hover .event-photo { transition: none; transform: none; }
+}

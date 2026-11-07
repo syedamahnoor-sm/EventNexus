@@ -1,0 +1,362 @@
+{
+  "ai-meetup": {
+    "id": 31367498,
+    "photographer": "Yusuf Çelik",
+    "sourceUrl": "https://www.pexels.com/photo/diverse-university-lecture-hall-audience-31367498/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Students listening to a talk in a university lecture hall.",
+    "imageUrl": "/images/events/ai-meetup.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "campus-hackathon": {
+    "id": 5965540,
+    "photographer": "Charlotte May",
+    "sourceUrl": "https://www.pexels.com/photo/positive-multiethnic-students-working-together-5965540/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Students collaborating around a laptop and sharing project notes.",
+    "imageUrl": "/images/events/campus-hackathon.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "cloud-lab": {
+    "id": 34804003,
+    "photographer": "Daniil Komov",
+    "sourceUrl": "https://www.pexels.com/photo/modern-workspace-with-laptop-and-code-display-34804003/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A laptop displaying code beside a notebook on a working desk.",
+    "imageUrl": "/images/events/cloud-lab.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "cybersecurity": {
+    "id": 5474285,
+    "photographer": "cottonbro studio",
+    "sourceUrl": "https://www.pexels.com/photo/hands-on-a-laptop-keyboard-5474285/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Hands working at a laptop with a removable USB device.",
+    "imageUrl": "/images/events/cybersecurity.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "robotics": {
+    "id": 33920046,
+    "photographer": "Zeal Creative Studios",
+    "sourceUrl": "https://www.pexels.com/photo/young-students-engaged-in-robotics-workshop-33920046/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Students assembling a small robot during a practical workshop.",
+    "imageUrl": "/images/events/robotics.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "open-source": {
+    "id": 5553723,
+    "photographer": "Armin Rimoldi",
+    "sourceUrl": "https://www.pexels.com/photo/serious-students-with-laptop-discussing-assignment-5553723/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Two students discussing a shared laptop project outdoors.",
+    "imageUrl": "/images/events/open-source.webp",
+    "cropCenter": [
+      0.5,
+      0.35
+    ]
+  },
+  "web-bootcamp": {
+    "id": 5926393,
+    "photographer": "Sora Shimazaki",
+    "sourceUrl": "https://www.pexels.com/photo/crop-faceless-programmer-working-on-laptop-in-studio-5926393/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A developer typing code on a laptop at a worktable.",
+    "imageUrl": "/images/events/web-bootcamp.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "ux-design": {
+    "id": 7213510,
+    "photographer": "Ivan S",
+    "sourceUrl": "https://www.pexels.com/photo/a-woman-sticking-notes-on-the-board-7213510/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Collaborators organizing research ideas on a wall of sticky notes.",
+    "imageUrl": "/images/events/ux-design.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "data-storytelling": {
+    "id": 8441819,
+    "photographer": "Kampus Production",
+    "sourceUrl": "https://www.pexels.com/photo/a-laptop-and-documents-on-the-table-8441819/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A laptop and printed charts arranged for a data analysis session.",
+    "imageUrl": "/images/events/data-storytelling.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "public-speaking": {
+    "id": 5940831,
+    "photographer": "Kampus Production",
+    "sourceUrl": "https://www.pexels.com/photo/young-student-making-presentation-to-classmates-and-teacher-5940831/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A student presenting ideas to a small discussion group in a library.",
+    "imageUrl": "/images/events/public-speaking.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "research-writing": {
+    "id": 6549912,
+    "photographer": "Tima Miroshnichenko",
+    "sourceUrl": "https://www.pexels.com/photo/a-woman-researching-in-the-library-6549912/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A student researching and writing at a library table.",
+    "imageUrl": "/images/events/research-writing.webp",
+    "cropCenter": [
+      0.5,
+      0.35
+    ]
+  },
+  "coding-challenge": {
+    "id": 5926382,
+    "photographer": "Sora Shimazaki",
+    "sourceUrl": "https://www.pexels.com/photo/crop-faceless-developer-working-on-software-code-on-laptop-5926382/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Hands typing a program into a code editor on a laptop.",
+    "imageUrl": "/images/events/coding-challenge.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "case-challenge": {
+    "id": 4623460,
+    "photographer": "Ketut Subiyanto",
+    "sourceUrl": "https://www.pexels.com/photo/man-showing-sticky-notes-4623460/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Two collaborators exploring ideas with notes on a chalkboard.",
+    "imageUrl": "/images/events/case-challenge.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "design-sprint": {
+    "id": 3471423,
+    "photographer": "Fabian Wiktor",
+    "sourceUrl": "https://www.pexels.com/photo/person-writing-on-white-paper-3471423/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A designer drawing a mobile interface prototype on paper.",
+    "imageUrl": "/images/events/design-sprint.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "debate-cup": {
+    "id": 8730783,
+    "photographer": "Mikhail Nilov",
+    "sourceUrl": "https://www.pexels.com/photo/man-in-blue-suit-standing-on-the-podium-8730783/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A young speaker delivering a speech from a podium.",
+    "imageUrl": "/images/events/debate-cup.webp",
+    "cropCenter": [
+      0.5,
+      0.18
+    ]
+  },
+  "innovation-showcase": {
+    "id": 7950122,
+    "photographer": "Roxanne Minnish",
+    "sourceUrl": "https://www.pexels.com/photo/college-students-crafting-a-project-7950122/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "College students building and testing a cardboard prototype together.",
+    "imageUrl": "/images/events/innovation-showcase.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "career-network": {
+    "id": 33714886,
+    "photographer": "Matheus Bertelli",
+    "sourceUrl": "https://www.pexels.com/photo/young-adults-socializing-at-an-indoor-event-33714886/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Young adults meeting and exchanging ideas at an indoor gathering.",
+    "imageUrl": "/images/events/career-network.webp",
+    "cropCenter": [
+      0.5,
+      0.35
+    ]
+  },
+  "internship-prep": {
+    "id": 5989943,
+    "photographer": "cottonbro studio",
+    "sourceUrl": "https://www.pexels.com/photo/person-holding-black-tablet-computer-5989943/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Participants reviewing application documents and a tablet across a table.",
+    "imageUrl": "/images/events/internship-prep.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "resume-clinic": {
+    "id": 3205566,
+    "photographer": "cottonbro studio",
+    "sourceUrl": "https://www.pexels.com/photo/woman-holding-clipboard-3205566/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A reviewer examining a resume on a clipboard at a desk.",
+    "imageUrl": "/images/events/resume-clinic.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "product-careers": {
+    "id": 8344905,
+    "photographer": "Henri Mathieu-Saint-Laurent",
+    "sourceUrl": "https://www.pexels.com/photo/a-people-having-conference-together-8344905/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Speakers exchanging perspectives during a live panel discussion.",
+    "imageUrl": "/images/events/product-careers.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "graduate-interview": {
+    "id": 4226120,
+    "photographer": "Anna Shvets",
+    "sourceUrl": "https://www.pexels.com/photo/woman-in-black-long-sleeve-shirt-having-a-job-interview-4226120/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "An interview conversation with a printed resume on the table.",
+    "imageUrl": "/images/events/graduate-interview.webp",
+    "cropCenter": [
+      0.5,
+      0.1
+    ]
+  },
+  "volunteer-drive": {
+    "id": 9543735,
+    "photographer": "Ron Lach",
+    "sourceUrl": "https://www.pexels.com/photo/people-picking-up-plastic-trash-on-the-dirt-ground-9543735/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Volunteers collecting litter together in an outdoor green space.",
+    "imageUrl": "/images/events/volunteer-drive.webp",
+    "cropCenter": [
+      0.5,
+      0.3
+    ]
+  },
+  "campus-garden": {
+    "id": 9724478,
+    "photographer": "cottonbro studio",
+    "sourceUrl": "https://www.pexels.com/photo/group-of-people-gardening-together-9724478/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Friends planting and tending potted plants together outdoors.",
+    "imageUrl": "/images/events/campus-garden.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "peer-mentoring": {
+    "id": 8419251,
+    "photographer": "RDNE Stock project",
+    "sourceUrl": "https://www.pexels.com/photo/women-having-a-conversation-while-standing-inside-the-classroom-8419251/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Two people talking beside a classroom window.",
+    "imageUrl": "/images/events/peer-mentoring.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "repair-cafe": {
+    "id": 12344250,
+    "photographer": "Fernanda Simões",
+    "sourceUrl": "https://www.pexels.com/photo/close-up-of-a-worker-using-a-machine-12344250/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Hands guiding fabric through a sewing machine during a repair.",
+    "imageUrl": "/images/events/repair-cafe.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "reading-circle": {
+    "id": 7261872,
+    "photographer": "Raquel",
+    "sourceUrl": "https://www.pexels.com/photo/close-up-of-people-sitting-with-books-7261872/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A reading group holding open books during a shared reading session.",
+    "imageUrl": "/images/events/reading-circle.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "film-discussion": {
+    "id": 7081182,
+    "photographer": "Bence Szemerey",
+    "sourceUrl": "https://www.pexels.com/photo/high-angle-shot-of-people-watching-movie-inside-the-theater-7081182/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "An audience watching a screening inside a cinema.",
+    "imageUrl": "/images/events/film-discussion.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "astronomy-night": {
+    "id": 9143839,
+    "photographer": "Pavel Danilyuk",
+    "sourceUrl": "https://www.pexels.com/photo/a-person-using-a-laptop-outside-9143839/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A person using a laptop beside an observing telescope at twilight.",
+    "imageUrl": "/images/events/astronomy-night.webp",
+    "cropCenter": [
+      0.5,
+      1.0
+    ]
+  },
+  "board-games": {
+    "id": 8111356,
+    "photographer": "Pavel Danilyuk",
+    "sourceUrl": "https://www.pexels.com/photo/people-sitting-on-a-wooden-table-playing-board-game-8111356/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "Friends playing a tabletop strategy game together.",
+    "imageUrl": "/images/events/board-games.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  },
+  "creative-open-mic": {
+    "id": 15789086,
+    "photographer": "Viktorya Sergeeva",
+    "sourceUrl": "https://www.pexels.com/photo/woman-standing-and-playing-guitar-and-singing-15789086/",
+    "licenseUrl": "https://www.pexels.com/legal-pages/license/",
+    "alt": "A musician performing with an acoustic guitar and microphone on a small stage.",
+    "imageUrl": "/images/events/creative-open-mic.webp",
+    "cropCenter": [
+      0.5,
+      0.5
+    ]
+  }
+}

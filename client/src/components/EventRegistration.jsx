@@ -108,7 +108,7 @@ export default function EventRegistration({ event, availability, refresh }) {
     <div className={`registration-status status-${availability.state}`}><span aria-hidden="true" />{availability.title}</div>
     <p className="registration-copy">{availability.description}</p>
     <div className="seat-count"><strong>{availability.remaining ?? '—'}</strong><span>places remaining<br />{availability.capacity ? `of ${availability.capacity} total places` : 'Capacity unconfirmed'}</span></div>
-    {availability.capacity && <meter className="seat-meter" min="0" max={availability.capacity} value={availability.remaining} aria-label={`${availability.remaining} seats remaining out of ${availability.capacity}`} />}
+    {availability.capacity && availability.remaining !== null && <meter className="seat-meter" min="0" max={availability.capacity} value={availability.remaining} aria-label={`${availability.remaining} seats remaining out of ${availability.capacity}`} />}
     <div className="registration-action">{renderAction()}</div>
     {feedback && <p className={`registration-feedback ${feedback.type}`} role={feedback.type === 'error' ? 'alert' : 'status'}>{feedback.text}</p>}
     <p className="registration-footnote">Availability is confirmed when your registration is accepted.</p>

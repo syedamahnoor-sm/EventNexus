@@ -1,5 +1,6 @@
 
 const mongoose = require("mongoose");
+const { isEventImageUrl } = require('../validators/imageUrl');
 
 const eventSchema = new mongoose.Schema(
     {
@@ -16,6 +17,15 @@ const eventSchema = new mongoose.Schema(
             trim: true,
             maxlength: 2000
         },
+
+        imageUrl: {
+            type: String,
+            trim: true,
+            maxlength: 2048,
+            validate: { validator: isEventImageUrl, message: 'Use an HTTPS image URL or a local event image path' }
+        },
+
+        imageAlt: { type: String, trim: true, maxlength: 200 },
 
         category: {
             type: String,

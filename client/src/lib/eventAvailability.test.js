@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { eventAvailability } from './eventAvailability.js';
+import { eventAvailability, eventSeats } from './eventAvailability.js';
 
 const now = Date.parse('2030-01-01T12:00:00Z');
 const event = { status: 'upcoming', date: '2030-01-02T12:00:00Z', capacity: 20, registeredCount: 7 };
@@ -10,6 +10,16 @@ test('future events expose actual capacity and remaining seats', () => {
   assert.equal(result.canRegister, true);
   assert.equal(result.remaining, 13);
   assert.equal(result.capacity, 20);
+});
+
+test('missing or invalid counters never manufacture available seats', () => {
+  for (const registeredCount of [undefined, null, -1, NaN, 1.5, '7']) {
+    const data = { ...event, registeredCount };
+    assert.equal(eventSeats(data).remaining, null);
+    assert.equal(eventAvailability(data, now).state, 'unconfirmed');
+    assert.equal(eventAvailability(data, now).canRegister, false);
+  }
+  assert.equal(eventSeats({ ...event, registeredCount: 0 }).remaining, 20);
 });
 
 test('full and over-capacity events never offer registration or negative seats', () => {

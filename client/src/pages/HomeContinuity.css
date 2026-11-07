@@ -1,5 +1,13 @@
 /* Campus continuity: an offset index and a shared seam; other boundaries stay quiet. */
-.home-page .noticeboard { position: relative; }
+.home-page .noticeboard { position: relative; padding-bottom: 40px; }
+.noticeboard-more { display: flex; align-items: center; justify-content: flex-end; gap: 24px; margin-top: 28px; }
+.noticeboard-more:before { content: ''; flex: 1; height: 1px; background: var(--line); }
+.noticeboard-more-link { display: inline-flex; align-items: center; gap: 18px; min-height: 48px; font-size: 14px; font-weight: 600; }
+.noticeboard-more-arrow { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid #adb5a6; transition: background 220ms, color 220ms, border-color 220ms; }
+.noticeboard-more-arrow svg { transition: transform 300ms var(--ease-editorial); }
+.noticeboard-more-link:is(:hover, :focus-visible) .noticeboard-more-arrow { background: var(--ink); color: var(--lime); border-color: var(--ink); }
+.noticeboard-more-link:is(:hover, :focus-visible) svg { transform: translate(3px, -3px); }
+.noticeboard-more-link:active .noticeboard-more-arrow { transform: translateY(1px); }
 .noticeboard-bridge { position: absolute; top: -11px; right: 0; display: flex; align-items: center; gap: 18px; height: 36px; padding: 0 14px; background: var(--paper); border-top: 2px solid var(--terra); font-size: 8px; letter-spacing: .1em; }
 .noticeboard-bridge > span:first-child { font-family: var(--display); font-size: 22px; letter-spacing: 0; }
 .noticeboard-bridge > svg { width: 15px; height: 15px; }
@@ -30,6 +38,9 @@
   }
 }
 @media (max-width: 760px) {
+  .home-page .noticeboard { padding-bottom: 32px; }
+  .noticeboard-more { margin-top: 22px; gap: 16px; }
+  .noticeboard-more-link { font-size: 13px; gap: 14px; }
   .noticeboard-bridge { height: 30px; gap: 12px; font-size: 7px; top: -8px; padding-inline: 10px; }
   .noticeboard-bridge > span:first-child { font-size: 19px; }
   .home-page .interests:before { height: 13px; top: -12px; width: 42%; }

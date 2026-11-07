@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 
-export default function useEvents({ search = '', category = '', period = '', sort = 'soonest', page = 1, limit = 12 } = {}) {
+export default function useEvents({ search = '', category = '', period = '', status = 'upcoming', sort = 'soonest', page = 1, limit = 12 } = {}) {
   const [state, setState] = useState({ events: [], pagination: { total: 0, totalPages: 0 }, loading: true, error: false });
   const [retryKey, setRetryKey] = useState(0);
-  const key = JSON.stringify({ search, category, period, sort, page, limit, retryKey });
+  const key = JSON.stringify({ search, category, period, status, sort, page, limit, retryKey });
   useEffect(() => {
     const controller = new AbortController();
     const params = JSON.parse(key);
