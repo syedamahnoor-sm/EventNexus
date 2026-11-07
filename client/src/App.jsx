@@ -12,13 +12,14 @@ import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import StudentDashboard from "./pages/StudentDashboard";
-import OrganizerDashboard from "./pages/OrganizerDashboard";
+import AuthProvider from './auth/AuthProvider';
+import ProtectedRoute from './auth/ProtectedRoute';
+import AccountPlaceholder from './auth/AccountPlaceholder';
 import EventDetails from "./pages/EventDetails";
 
 export default function App() {
     return (
-        <BrowserRouter>
+        <BrowserRouter><AuthProvider>
             <Navbar />
 
             <MotionShell><Routes>
@@ -30,13 +31,13 @@ export default function App() {
                 <Route path="/register" element={<Register />} />
                 <Route
                     path="/student/dashboard"
-                    element={<StudentDashboard />}
+                    element={<ProtectedRoute role="student"><AccountPlaceholder /></ProtectedRoute>}
                 />
                 <Route
                     path="/organizer/dashboard"
-                    element={<OrganizerDashboard />}
+                    element={<ProtectedRoute role="organizer"><AccountPlaceholder /></ProtectedRoute>}
                 />
             </Routes></MotionShell>
-        </BrowserRouter>
+        </AuthProvider></BrowserRouter>
     );
 }

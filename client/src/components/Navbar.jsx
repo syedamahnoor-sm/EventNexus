@@ -1,21 +1,19 @@
 import './Navbar.css';
 import BrandMark from './BrandMark';
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import api from '../api/axios';
+import { Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 import Arrow from './Arrow';
 
 export default function Navbar() {
  const [open, setOpen] = useState(false);
- const [session, setSession] = useState({ status: 'loading', user: null });
- const { pathname } = useLocation();
- useEffect(() => {
-  const controller = new AbortController();
-  api.get('/auth/me', { timeout: 10000, signal: controller.signal }).then(({ data }) => setSession({ status: 'ready', user: data.user })).catch(error => {
-   if (!controller.signal.aborted) setSession({ status: error.response?.status === 401 ? 'ready' : 'unavailable', user: null });
-  });
-  return () => controller.abort();
- }, [pathname]);
+ const session = useAuth();
+ const [logoutError, setLogoutError] = useState('');
+ async function logout() {
+  setLogoutError('');
+  try { await session.logout(); setOpen(false); }
+  catch { setLogoutError('Log out could not be confirmed. Please reconnect and try again.'); }
+ }
  useEffect(() => {
   const header = document.querySelector('.site-header');
   let frame = 0;
@@ -35,6 +33,7 @@ export default function Navbar() {
  <button className="menu-toggle" aria-expanded={open} aria-controls="main-navigation" onClick={() => setOpen(value => !value)}>{open ? 'Close -' : 'Menu +'}</button>
  <nav id="main-navigation" aria-label="Main navigation" className={open ? 'navigation is-open' : 'navigation'} onKeyDown={event => { if (event.key === 'Escape') { close(); document.querySelector('.menu-toggle')?.focus(); } }}>
  <NavLink to="/" end onClick={close}>Home</NavLink><NavLink to="/events" end onClick={close}>Explore events</NavLink><NavLink to="/events/past" onClick={close}>Previous events</NavLink>
- {session.user ? <Link className="button small account-entry" to={accountPath} onClick={close}>My {session.user.role === 'organizer' ? 'workspace' : 'events'} <Arrow diagonal /></Link> : session.status !== 'loading' ? <><Link className="account-entry" to="/login" onClick={close}>Log in</Link><Link className="button small" to="/register" onClick={close}>Join the campus <Arrow diagonal /></Link></> : <span className="session-loading" aria-label="Checking session" />}
+ {session.user ? <><Link className="account-entry" to={accountPath} onClick={close}>{session.user.role === 'organizer' ? 'Organizer account' : 'Student account'}</Link><button className="button small nav-logout" onClick={logout} disabled={session.pending}>{session.pending ? 'Please wait…' : 'Log out'} <Arrow diagonal /></button></> : session.status === 'ready' ? <><NavLink className="account-entry" to="/login" onClick={close}>Log in</NavLink><Link className="button small" to="/register" onClick={close}>Join the campus <Arrow diagonal /></Link></> : session.status === 'error' ? <button className="nav-session-retry account-entry" onClick={session.refresh}>Retry account check</button> : <span className="session-loading" role="status" aria-label="Checking session" />}
+ {logoutError && <p className="nav-auth-error" role="alert">{logoutError}</p>}
  </nav></div></header>;
 }

@@ -1,11 +1,2 @@
-import React from 'react'
-
-const Register = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
-
-export default Register
+import AuthForm from '../components/AuthForm';
+export default function Register() { return <AuthForm registering />; }

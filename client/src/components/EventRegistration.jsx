@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import Arrow from './Arrow';
+import { useAuth } from '../auth/AuthContext';
 
 export default function EventRegistration({ event, availability, refresh }) {
+  const { user, status, refresh: refreshSession } = useAuth();
   const [attempt, setAttempt] = useState(0);
   const [account, setAccount] = useState({ state: 'checking', attempt: -1 });
   const [feedback, setFeedback] = useState(null);
@@ -11,30 +13,32 @@ export default function EventRegistration({ event, availability, refresh }) {
   const busy = useRef(false);
   const mutation = useRef(null);
   const uncertain = useRef(false);
-  const checking = account.attempt !== attempt;
+  const checking = status === 'loading' || account.attempt !== attempt || account.userId !== user?.id;
 
   useEffect(() => {
     const controller = new AbortController();
     async function check() {
       try {
-        const { data } = await api.get('/auth/me', { signal: controller.signal, timeout: 10000 });
-        if (data.user.role !== 'student') {
-          if (!controller.signal.aborted) setAccount({ state: 'organizer', attempt });
+        if (status === 'loading') return;
+        if (status === 'error') { setAccount({ state: 'error', attempt, userId: user?.id }); return; }
+        if (!user) { setAccount({ state: 'guest', attempt, userId: user?.id }); return; }
+        if (user.role !== 'student') {
+          if (!controller.signal.aborted) setAccount({ state: 'organizer', attempt, userId: user?.id });
           return;
         }
         const response = await api.get('/registrations/me', { signal: controller.signal, timeout: 10000 });
         const registered = response.data.data.some(item => (item.event?._id || item.event) === event._id);
         if (!controller.signal.aborted) {
-          setAccount({ state: registered ? 'registered' : 'student', attempt });
+          setAccount({ state: registered ? 'registered' : 'student', attempt, userId: user?.id });
           if (uncertain.current) { refresh(); uncertain.current = false; }
         }
       } catch (error) {
-        if (!controller.signal.aborted) setAccount({ state: error.response?.status === 401 ? 'guest' : 'error', attempt });
+        if (!controller.signal.aborted) setAccount({ state: error.response?.status === 401 ? 'guest' : 'error', attempt, userId: user?.id });
       }
     }
     check();
     return () => controller.abort();
-  }, [event._id, attempt, refresh]);
+  }, [event._id, attempt, refresh, user, status]);
 
   useEffect(() => () => mutation.current?.abort(), []);
 
@@ -53,14 +57,14 @@ export default function EventRegistration({ event, availability, refresh }) {
         headers: { 'X-CSRF-Token': data.csrfToken }, signal: controller.signal, timeout: 15000,
       });
       if (controller.signal.aborted) return;
-      setAccount({ state: 'registered', attempt });
+      setAccount({ state: 'registered', attempt, userId: user?.id });
       setFeedback({ type: 'success', text: 'You’re registered. Your place is confirmed.' });
       refresh();
     } catch (error) {
       if (controller.signal.aborted) return;
       const status = error.response?.status;
       if (status === 401) {
-        setAccount({ state: 'guest', attempt });
+        setAccount({ state: 'guest', attempt, userId: user?.id });
         setFeedback({ type: 'error', text: 'Your session has ended. Please log in again.' });
       } else if (status === 409) {
         setFeedback({ type: 'error', text: error.response.data.message || 'Availability has changed. Checking your registration…' });
@@ -70,9 +74,9 @@ export default function EventRegistration({ event, availability, refresh }) {
       } else if (sent && (!error.response || status >= 500)) {
         setFeedback({ type: 'error', text: 'We couldn’t confirm the result. Check your registration before trying again.' });
         uncertain.current = true;
-        setAccount({ state: 'error', attempt });
+        setAccount({ state: 'error', attempt, userId: user?.id });
       } else {
-        if (status === 403) setAccount({ state: 'error', attempt });
+        if (status === 403) setAccount({ state: 'error', attempt, userId: user?.id });
         setFeedback({ type: 'error', text: status === 403 ? 'Your session or security token could not be verified. Please check your session and try again.' : 'Registration could not be completed. Please try again.' });
       }
     } finally {
@@ -95,7 +99,7 @@ export default function EventRegistration({ event, availability, refresh }) {
     if (account.state === 'organizer') return <p>Registration is available to student accounts. You’re signed in as an organizer.</p>;
     if (account.state === 'error') return <>
       <p>We couldn’t verify your session or registration.</p>
-      <button className="button secondary" onClick={() => setAttempt(value => value + 1)}>Check again <Arrow /></button>
+      <button className="button secondary" onClick={() => { refreshSession(); setAttempt(value => value + 1); }}>Check again <Arrow /></button>
     </>;
     return <button className="button lime" onClick={register} disabled={submitting} aria-busy={submitting}>
       {submitting ? 'Reserving your place…' : 'Register for this event'}<Arrow diagonal />
