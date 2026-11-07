@@ -41,6 +41,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/events", registrationRoutes);
 app.use("/api/registrations", myRegistrationsRouter);
 app.use('/api/students', require('./routes/studentRoutes'));
+app.use('/api/organizer', require('./routes/organizerRoutes'));
 
 app.use(errorHandler);
 

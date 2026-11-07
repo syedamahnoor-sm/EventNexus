@@ -14,7 +14,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
-import AccountPlaceholder from './auth/AccountPlaceholder';
+import OrganizerDashboard from './pages/OrganizerDashboard';
 import EventDetails from "./pages/EventDetails";
 import EventRegistrationPage from './pages/EventRegistrationPage';
 import StudentDashboard from './pages/StudentDashboard';
@@ -40,7 +40,7 @@ export default function App() {
                 />
                 <Route
                     path="/organizer/dashboard"
-                    element={<ProtectedRoute role="organizer"><AccountPlaceholder /></ProtectedRoute>}
+                    element={<ProtectedRoute role="organizer"><OrganizerDashboard /></ProtectedRoute>}
                 />
             </Routes></MotionShell>
         </AuthProvider></BrowserRouter>

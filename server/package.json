@@ -19,6 +19,7 @@
     "test:archive": "node --test scripts/seed-events/archive.test.js",
     "test:registration": "node --test scripts/registration.test.js",
     "test:avatars": "node --test scripts/avatar.test.js",
+    "test:organizer": "node --test scripts/organizer.test.js",
     "avatars:cleanup": "node scripts/cleanup-avatars.js"
   },
   "keywords": [],
