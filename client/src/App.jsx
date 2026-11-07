@@ -1,3 +1,4 @@
+import PreviousEvents from './pages/PreviousEvents';
 import {
     BrowserRouter,
     Routes,
@@ -23,6 +24,7 @@ export default function App() {
             <MotionShell><Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/events" element={<Events />} />
+                <Route path="/events/past" element={<PreviousEvents />} />
                 <Route path="/events/:id" element={<EventDetails />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

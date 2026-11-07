@@ -7,7 +7,7 @@ No runtime event fixtures, hardcoded event records, manually chosen event IDs, o
 | Feature | Actual data path | Audit result |
 | --- | --- | --- |
 | Home noticeboard | `Home` → `useEvents` → `GET /api/events?status=upcoming&sort=soonest&page=1&limit=3` → `Event.find` | Three records selected by MongoDB, not fetched wholesale or manually curated. |
-| Upcoming eligibility | `getAllEvents` builds `{ status: 'upcoming', date: { $gte: now } }` | Cancelled/completed/past records are excluded. |
+| Upcoming eligibility | `getAllEvents` builds `{ status: 'upcoming', date: { $gt: now } }` | Cancelled/completed/past records are excluded. |
 | Explore listing | `Events` reads URL parameters and passes them to the same hook and endpoint | No client-side filtering or slicing of event pages. |
 | Category discovery/filtering | Static supported labels generate `category` query parameters; backend validates the enum and filters MongoDB | Category labels/taglines are interface configuration, not event records. |
 | Search | `search` query → escaped MongoDB regex across title, description and location | A 300ms input debounce; no local fake results or subset search. |

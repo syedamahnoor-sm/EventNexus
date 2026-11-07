@@ -27,6 +27,20 @@ const eventSchema = new mongoose.Schema(
 
         imageAlt: { type: String, trim: true, maxlength: 200 },
 
+        recap: { type: String, trim: true, maxlength: 10000 },
+        highlights: {
+            type: [{ type: String, trim: true, maxlength: 240, required: true }], default: undefined,
+            validate: { validator: value => !value || value.length <= 8, message: 'At most eight highlights are allowed' }
+        },
+        gallery: {
+            type: [new mongoose.Schema({
+                imageUrl: { type: String, required: true, maxlength: 2048, validate: isEventImageUrl },
+                alt: { type: String, required: true, trim: true, maxlength: 200 },
+                caption: { type: String, trim: true, maxlength: 240 }
+            }, { _id: false })], default: undefined,
+            validate: { validator: value => !value || value.length <= 12, message: 'At most twelve gallery photos are allowed' }
+        },
+
         category: {
             type: String,
             enum: [

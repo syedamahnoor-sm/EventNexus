@@ -1,7 +1,8 @@
 const Event = require("../models/Event");
 const mongoose = require("mongoose")
 
-const { createEventSchema, updateEventSchema } = require("../validators/eventValidator");
+const { createEventSchema, updateEventSchema, updateRecapSchema } = require("../validators/eventValidator");
+const { eventWindow } = require('../utils/eventLifecycle');
 
 const createEvent = async (req, res, next) => {
     try {
@@ -41,7 +42,8 @@ const getAllEvents = async (req, res, next) => {
             category,
             period,
             status,
-            sort = "soonest"
+            scope = "upcoming",
+            sort = scope === 'past' ? 'latest' : 'soonest'
         } = req.query;
 
         // Strict pagination
@@ -103,9 +105,11 @@ const getAllEvents = async (req, res, next) => {
             });
         }
 
-        const filter = {
-            status: status || "upcoming"
-        };
+        if (!['upcoming', 'past'].includes(scope) || (scope === 'past' && (status === 'cancelled' || period))) {
+            return res.status(400).json({ message: 'Invalid event scope or incompatible archive filters' });
+        }
+        const now = new Date();
+        const filter = eventWindow(scope, status, now);
 
         if (category) {
             filter.category = category;
@@ -134,12 +138,6 @@ const getAllEvents = async (req, res, next) => {
         }
 
         // Filter events by date
-        const now = new Date();
-
-        if (filter.status === "upcoming") {
-            filter.date = { $gte: now };
-        }
-
         if (period) {
             const end = new Date(now);
 
@@ -151,7 +149,7 @@ const getAllEvents = async (req, res, next) => {
 
             filter.date = {
                 ...(filter.date || {}),
-                $gte: now,
+                $gt: now,
                 $lt: end
             };
         }
@@ -249,7 +247,8 @@ const updateEvent = async (req, res, next) => {
         const filter = {
             _id: id,
             organizer: req.user._id,
-            status: "upcoming"
+            status: "upcoming",
+            date: { $gt: new Date() }
         };
 
         // Capacity must not fall below current registrations
@@ -285,9 +284,9 @@ const updateEvent = async (req, res, next) => {
                 });
             }
 
-            if (event.status !== "upcoming") {
+            if (event.status !== "upcoming" || event.date <= new Date()) {
                 return res.status(409).json({
-                    message: "Only upcoming events can be updated"
+                    message: "Only future upcoming event details can be updated; past events support recap updates"
                 });
             }
 
@@ -354,10 +353,28 @@ const deleteEvent = async (req, res, next) => {
     }
 };
 
+const updateEventRecap = async (req, res, next) => {
+    try {
+        if (!mongoose.isObjectIdOrHexString(req.params.id)) return res.status(400).json({ message: 'Invalid event ID' });
+        const result = updateRecapSchema.safeParse(req.body);
+        if (!result.success) return res.status(400).json({ message: 'Invalid recap data', errors: result.error.flatten() });
+        const event = await Event.findOneAndUpdate({
+            _id: req.params.id, organizer: req.user._id,
+            status: { $in: ['upcoming', 'completed'] }, date: { $lte: new Date() },
+        }, { $set: result.data }, { new: true, runValidators: true });
+        if (event) return res.status(200).json({ message: 'Event recap updated', data: event });
+        const existing = await Event.findById(req.params.id).select('organizer');
+        if (!existing) return res.status(404).json({ message: 'Event not found' });
+        if (!existing.organizer.equals(req.user._id)) return res.status(403).json({ message: 'You can only update your own event recap' });
+        return res.status(409).json({ message: 'Recaps are only available for non-cancelled events whose scheduled date has passed' });
+    } catch (error) { next(error); }
+};
+
 module.exports = {
     createEvent,
     getAllEvents,
     getEventById,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    updateEventRecap
 };

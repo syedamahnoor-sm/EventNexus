@@ -1,3 +1,4 @@
+import './Navbar.css';
 import BrandMark from './BrandMark';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
@@ -33,7 +34,7 @@ export default function Navbar() {
  <span className="nav-caption">YOUR CAMPUS.<br />YOUR NEXT CHAPTER.</span>
  <button className="menu-toggle" aria-expanded={open} aria-controls="main-navigation" onClick={() => setOpen(value => !value)}>{open ? 'Close -' : 'Menu +'}</button>
  <nav id="main-navigation" aria-label="Main navigation" className={open ? 'navigation is-open' : 'navigation'} onKeyDown={event => { if (event.key === 'Escape') { close(); document.querySelector('.menu-toggle')?.focus(); } }}>
- <NavLink to="/" end onClick={close}>Home</NavLink><NavLink to="/events" onClick={close}>Explore events</NavLink>
- {session.user ? <Link className="button small" to={accountPath} onClick={close}>My {session.user.role === 'organizer' ? 'workspace' : 'events'} <Arrow diagonal /></Link> : session.status !== 'loading' ? <><Link to="/login" onClick={close}>Log in</Link><Link className="button small" to="/register" onClick={close}>Join the campus <Arrow diagonal /></Link></> : <span className="session-loading" aria-label="Checking session" />}
+ <NavLink to="/" end onClick={close}>Home</NavLink><NavLink to="/events" end onClick={close}>Explore events</NavLink><NavLink to="/events/past" onClick={close}>Previous events</NavLink>
+ {session.user ? <Link className="button small account-entry" to={accountPath} onClick={close}>My {session.user.role === 'organizer' ? 'workspace' : 'events'} <Arrow diagonal /></Link> : session.status !== 'loading' ? <><Link className="account-entry" to="/login" onClick={close}>Log in</Link><Link className="button small" to="/register" onClick={close}>Join the campus <Arrow diagonal /></Link></> : <span className="session-loading" aria-label="Checking session" />}
  </nav></div></header>;
 }

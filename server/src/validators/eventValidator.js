@@ -26,4 +26,14 @@ const updateEventSchema = createEventSchema.partial().extend({ category: eventCa
     }
 );
 
-module.exports = { createEventSchema, updateEventSchema };
+const updateRecapSchema = z.strictObject({
+    recap: z.string().trim().max(10000).optional(),
+    highlights: z.array(z.string().trim().min(1).max(240)).max(8).optional(),
+    gallery: z.array(z.strictObject({
+        imageUrl: z.string().trim().min(1).max(2048).refine(isEventImageUrl),
+        alt: z.string().trim().min(1).max(200),
+        caption: z.string().trim().max(240).optional(),
+    })).max(12).optional(),
+}).refine(data => Object.keys(data).length > 0, 'At least one recap field is required');
+
+module.exports = { createEventSchema, updateEventSchema, updateRecapSchema };

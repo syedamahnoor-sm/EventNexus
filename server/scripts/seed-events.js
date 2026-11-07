@@ -6,7 +6,7 @@ const { BATCH_ID, DISTRIBUTION, buildCatalog } = require('./seed-events/catalog'
 async function main() {
   require('dotenv').config({ path: path.join(__dirname, '../.env'), quiet: true });
   const mode = process.argv[2] || 'seed';
-  if (!['seed', 'cleanup', 'verify', 'images'].includes(mode) || process.argv.length > 3) throw new SeedSafetyError('Use seed, cleanup, verify, or images; unexpected arguments are refused.');
+  if (!['seed', 'cleanup', 'verify', 'images', 'archive', 'archive-cleanup', 'archive-verify'].includes(mode) || process.argv.length > 3) throw new SeedSafetyError('Unsupported seed command; unexpected arguments are refused.');
   const database = assertDevelopment(process.env);
   const connectDB = require('../src/config/db');
   const { seed, cleanup, attachPhotos, inspect, Manifest } = require('./seed-events/store');
@@ -19,7 +19,12 @@ async function main() {
   const Event = require('../src/models/Event');
   const Registration = require('../src/models/Registration');
   await Promise.all([User.init(), Event.init(), Registration.init(), Manifest.init()]);
-  if (mode === 'seed') {
+  if (mode.startsWith('archive')) {
+    const { seedHistorical, cleanupHistorical, verifyHistorical } = require('./seed-events/historical');
+    if (mode === 'archive') console.log('Historical development cohort:', JSON.stringify(await seedHistorical()));
+    else if (mode === 'archive-cleanup') console.log('Removed only archive-owned records:', JSON.stringify(await cleanupHistorical()));
+    else await verifyHistorical();
+  } else if (mode === 'seed') {
     const result = await seed();
     console.log(`${result.created ? 'Created' : 'Preserved existing cohort:'} ${result.events} sample events, ${result.users} sample users, ${result.registrations} tracked registrations.`);
     console.log('Category distribution:', JSON.stringify(DISTRIBUTION));

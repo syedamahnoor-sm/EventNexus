@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { eventAvailability, eventSeats } from './eventAvailability.js';
+import { eventAvailability, eventSeats, isPastEvent, hasEventRecap } from './eventAvailability.js';
 
 const now = Date.parse('2030-01-01T12:00:00Z');
 const event = { status: 'upcoming', date: '2030-01-02T12:00:00Z', capacity: 20, registeredCount: 7 };
@@ -51,4 +51,24 @@ test('unknown dates, capacity and statuses cannot accidentally enable registrati
     assert.equal(result.state, 'unconfirmed');
     assert.equal(result.canRegister, false);
   }
+});
+
+test('archive eligibility includes expired upcoming records, never cancellations or future completions', () => {
+  for (const status of ['upcoming', 'completed']) {
+    const data = { ...event, status, date: new Date(now).toISOString() };
+    assert.equal(isPastEvent(data, now), true);
+    assert.equal(eventAvailability(data, now).title, 'Past event');
+    assert.equal(eventAvailability(data, now).canRegister, false);
+  }
+  assert.equal(isPastEvent({ ...event, status: 'cancelled', date: new Date(now - 1).toISOString() }, now), false);
+  assert.equal(isPastEvent({ ...event, status: 'completed' }, now), false);
+  assert.equal(eventAvailability({ ...event, status: 'completed' }, now).state, 'unconfirmed');
+});
+
+test('recap availability only reflects saved content', () => {
+  assert.equal(hasEventRecap(event), false);
+  assert.equal(hasEventRecap({ ...event, recap: '  ', highlights: [], gallery: [] }), false);
+  assert.equal(hasEventRecap({ ...event, recap: 'Organizer recap' }), true);
+  assert.equal(hasEventRecap({ ...event, highlights: ['Organizer supplied highlight'] }), true);
+  assert.equal(hasEventRecap({ ...event, gallery: [{ imageUrl: 'https://example.org/a.jpg', alt: 'Organizer image' }] }), true);
 });

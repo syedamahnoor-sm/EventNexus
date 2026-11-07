@@ -12,7 +12,11 @@
     "seed:events:verify": "node scripts/seed-events.js verify",
     "test:seed": "node --test scripts/seed-events/seed.test.js",
     "seed:events:images": "node scripts/seed-events.js images",
-    "seed:events:download-photos": "node scripts/seed-events/download-photos.js"
+    "seed:events:download-photos": "node scripts/seed-events/download-photos.js",
+    "seed:archive": "node scripts/seed-events.js archive",
+    "seed:archive:cleanup": "node scripts/seed-events.js archive-cleanup",
+    "seed:archive:verify": "node scripts/seed-events.js archive-verify",
+    "test:archive": "node --test scripts/seed-events/archive.test.js"
   },
   "keywords": [],
   "author": "",

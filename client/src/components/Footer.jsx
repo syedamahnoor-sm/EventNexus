@@ -1,4 +1,4 @@
-﻿import BrandMark from './BrandMark';
+import BrandMark from './BrandMark';
 import Arrow from './Arrow';
 import { Link } from 'react-router-dom';
 import './Footer.css';
@@ -18,6 +18,7 @@ export default function Footer({ editorial = false }) {
           <nav aria-label="Footer navigation">
             <Link to="/">Home <Arrow diagonal /></Link>
             <Link to="/events">Explore events <Arrow diagonal /></Link>
+            <Link to="/events/past">Previous events <Arrow diagonal /></Link>
             <Link to="/login">Account access <Arrow diagonal /></Link>
             <Link to="/register">Create an account <Arrow diagonal /></Link>
           </nav>

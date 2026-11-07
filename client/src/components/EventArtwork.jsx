@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { CATEGORIES } from '../lib/events';
 import './EventArtwork.css';
 
-export default function EventArtwork({ category, imageUrl, imageAlt = '', priority = false, className = '' }) {
+export default function EventArtwork({ category, imageUrl, imageAlt = '', priority = false, sizes, className = '' }) {
   const [failedUrl, setFailedUrl] = useState(null);
   const index = Math.max(0, CATEGORIES.indexOf(category));
   const photo = Boolean(imageUrl && imageUrl !== failedUrl);
@@ -13,7 +13,7 @@ export default function EventArtwork({ category, imageUrl, imageAlt = '', priori
       className="event-photo"
       src={imageUrl}
       srcSet={local ? `${imageUrl.replace(/\.webp$/, '-640.webp')} 640w, ${imageUrl} 1280w` : undefined}
-      sizes={local ? (priority ? '(max-width: 760px) calc(100vw - 40px), (max-width: 1100px) 55vw, 760px' : '(max-width: 440px) calc(100vw - 40px), (max-width: 760px) 45vw, (max-width: 1100px) 30vw, 410px') : undefined}
+      sizes={local ? sizes || (priority ? '(max-width: 760px) calc(100vw - 40px), (max-width: 1100px) 55vw, 760px' : '(max-width: 440px) calc(100vw - 40px), (max-width: 760px) 45vw, (max-width: 1100px) 30vw, 410px') : undefined}
       alt={imageAlt}
       width="1280" height="800"
       loading={priority ? 'eager' : 'lazy'}

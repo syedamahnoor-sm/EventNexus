@@ -99,3 +99,8 @@ Queries use the seed marker where appropriate, so pre-existing real events do no
 - A fresh final cohort was created and left in the database. The real API verification passed for every category, title search, seven-day filtering (10 events), calendar-month filtering (23 events), both sorts, pagination, details and invalid IDs. Database reference and seat-count checks also passed.
 - The frontend production build passed. Full frontend lint retains four pre-existing unused React imports in the untouched Login/Register and dashboard placeholders. No frontend code was changed.
 - Browser tooling was unavailable. Card links and the `/events/:id` route were inspected in source; actual browser clicks, layout and authenticated registration were not tested.
+
+
+## Separate Previous Events cohort
+
+Campus Rewind uses `npm run seed:archive`, `npm run seed:archive:verify`, and `npm run seed:archive:cleanup` under the same development guards. Its thirteen fictional historical fixtures and dedicated organizer have their own ownership manifest; the twelve eligible events are separate from the original thirty upcoming samples. See [Campus Rewind](../../../docs/campus-rewind.md) for lifecycle rules, recap validation, testing and cleanup behavior.

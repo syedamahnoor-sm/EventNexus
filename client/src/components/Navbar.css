@@ -1,0 +1,4 @@
+﻿.site-header .navigation>a:nth-child(3){margin-left:0}
+.site-header .navigation>.account-entry{margin-left:18px}
+@media(min-width:761px) and (max-width:1100px){.site-header .navigation{gap:17px}.site-header .navigation>.account-entry{margin-left:0}}
+@media(max-width:760px){.site-header .navigation>.account-entry{margin-left:0}}

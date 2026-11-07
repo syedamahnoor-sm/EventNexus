@@ -113,3 +113,14 @@
   .details-skeleton { animation:none; }
   .details-poster:hover .art-symbol { transform:translate(-50%,-48%) rotate(-15deg); }
 }
+.history-panel .history-next { display:flex; margin-top:24px; font-size:12px; }
+.details-recap { margin-top:45px; padding-top:30px; border-top:1px solid var(--line); }
+.details-recap h2 { font-size:clamp(40px,4vw,56px); margin-bottom:25px; }
+.details-recap h3 { font-size:17px; margin:25px 0 15px; }
+.details-recap ul { padding-left:20px; font-size:14px; color:var(--muted); line-height:1.9; }
+.recap-gallery { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-top:25px; }
+.recap-gallery figure { margin:0; min-width:0; }
+.recap-gallery img,.recap-photo-unavailable { width:100%; aspect-ratio:8/5; height:auto; object-fit:cover; background:#e8eadd; }
+.recap-photo-unavailable { display:grid; place-items:center; font-size:12px; color:var(--muted); }
+.recap-gallery figcaption { font-size:11px; color:var(--muted); line-height:1.7; margin-top:9px; }
+@media(max-width:520px){.recap-gallery{grid-template-columns:1fr}}
