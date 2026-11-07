@@ -4,20 +4,25 @@ const {
     registerForEvent,
     cancelRegistration,
     getMyRegistrations,
+    getMyEventRegistration,
     getEventRegistrations
 } = require("../controllers/registrationController");
 
 const requireAuth = require("../middleware/requireAuth");
 const requireRole = require("../middleware/requireRole");
+const validate = require('../middleware/validate');
+const { registerForEventSchema } = require('../validators/registrationValidation');
 
 const router = express.Router();
 const myRegistrationsRouter = express.Router();
+router.get('/:id/registration', requireAuth, requireRole('student'), getMyEventRegistration);
 
 // Student registers for an event
 router.post(
     "/:id/register",
     requireAuth,
     requireRole("student"),
+    validate(registerForEventSchema),
     registerForEvent
 );
 

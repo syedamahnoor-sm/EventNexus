@@ -30,6 +30,7 @@ export function authDestination(from, role) {
   if (!path || path.includes('\\') || [...path].some(character => character.charCodeAt(0) < 32)) return '/events';
   const pathname = path.split(/[?#]/)[0];
   if (['/', '/events', '/events/past'].includes(pathname) || /^\/events\/[a-f\d]{24}$/i.test(pathname)) return path;
+  if (/^\/events\/[a-f\d]{24}\/register$/i.test(pathname) && role === 'student') return path;
   if (pathname === `/${role}/dashboard` && ['student', 'organizer'].includes(role)) return path;
   return '/events';
 }

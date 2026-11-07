@@ -1,8 +1,10 @@
 
 const mongoose = require("mongoose");
+const studentDetailsSchema = require('./studentDetailsSchema');
 
 const registrationSchema = new mongoose.Schema(
     {
+        attendee: { type: studentDetailsSchema, default: undefined },
         student: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

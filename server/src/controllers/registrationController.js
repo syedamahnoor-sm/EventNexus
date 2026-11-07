@@ -3,6 +3,14 @@ const mongoose = require("mongoose");
 const Event = require("../models/Event");
 const Registration = require("../models/Registration");
 
+const getMyEventRegistration = async (req, res, next) => {
+    if (!mongoose.isObjectIdOrHexString(req.params.id)) return res.status(400).json({ message: 'Invalid event ID' });
+    try {
+        const registration = await Registration.findOne({ student: req.user._id, event: req.params.id }).lean();
+        return res.status(200).json({ data: registration });
+    } catch (error) { next(error); }
+};
+
 const registerForEvent = async (req, res, next) => {
     const { id } = req.params;
 
@@ -16,6 +24,12 @@ const registerForEvent = async (req, res, next) => {
         let createdRegistration;
 
         await mongoose.connection.transaction(async (session) => {
+            // Check first so an existing registration stays recognizable even when full.
+            if (await Registration.exists({ student: req.user._id, event: id }).session(session)) {
+                const error = new Error('You are already registered for this event');
+                error.status = 409;
+                throw error;
+            }
             // Reserve a seat only if the event is eligible
             const event = await Event.findOneAndUpdate(
                 {
@@ -45,7 +59,8 @@ const registerForEvent = async (req, res, next) => {
             const registrations = await Registration.create(
                 [{
                     student: req.user._id,
-                    event: event._id
+                    event: event._id,
+                    attendee: req.body.attendee
                 }],
                 { session }
             );
@@ -218,6 +233,7 @@ const getEventRegistrations = async (req, res, next) => {
 };
 
 module.exports = {
+    getMyEventRegistration,
     registerForEvent,
     cancelRegistration,
     getMyRegistrations,

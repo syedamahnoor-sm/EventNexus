@@ -16,6 +16,7 @@ import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AccountPlaceholder from './auth/AccountPlaceholder';
 import EventDetails from "./pages/EventDetails";
+import EventRegistrationPage from './pages/EventRegistrationPage';
 
 export default function App() {
     return (
@@ -26,6 +27,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/events/past" element={<PreviousEvents />} />
+                <Route path="/events/:id/register" element={<ProtectedRoute role="student"><EventRegistrationPage /></ProtectedRoute>} />
                 <Route path="/events/:id" element={<EventDetails />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
