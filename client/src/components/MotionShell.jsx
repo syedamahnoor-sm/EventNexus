@@ -41,7 +41,7 @@ export default function MotionShell({ children }) {
           observer.unobserve(entry.target);
         });
       }, { threshold: 0.12 });
-      root.querySelectorAll('.section-heading, .category-list, .journey-steps, .closing, .surface-seam').forEach(element => observer.observe(element));
+      root.querySelectorAll('.section-heading, .category-list, .journey-steps, .closing, .surface-seam, .site-footer--editorial').forEach(element => observer.observe(element));
     }
     return () => { observer?.disconnect(); cancelAnimationFrame(pointerFrame.current); };
   }, [pathname]);

@@ -1,0 +1,101 @@
+/* A light discovery interlude; the strong ink conclusion belongs to the footer. */
+.home-page .interests {
+  color: var(--ink);
+  background: linear-gradient(115deg, #f0f4dc 0%, #e2edc6 58%, #d6e9c4 100%);
+  padding-block: 72px 82px;
+}
+.home-page .interests:before {
+  top: -1px;
+  left: 0;
+  right: auto;
+  width: 30%;
+  height: 14px;
+  background: var(--paper);
+}
+.home-page .interests-layout {
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.5fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+.home-page .interests .eyebrow { color: #526346; }
+.home-page .interests-intro h2 { font-size: clamp(52px, 5.2vw, 70px); line-height: 1; }
+.home-page .interests-intro > p:not(.eyebrow) { color: #52604d; max-width: 285px; }
+.home-page .interest-star {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: static;
+  margin-top: 32px;
+  color: var(--ink);
+  font-size: 48px;
+}
+.home-page .interest-star .brand-mark { width: 48px; height: 48px; }
+.home-page .interest-star small { font-size: 8px; font-weight: 500; line-height: 1.9; letter-spacing: .11em; }
+.home-page .category-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 28px;
+  min-width: 0;
+}
+.home-page .category-list > a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 23px;
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  gap: 18px 10px;
+  min-height: 137px;
+  padding: 20px 14px;
+  border-top: 1px solid #202a2938;
+  border-bottom: 0;
+  color: var(--ink);
+}
+.home-page .category-number { grid-area: 1 / 1; color: #526346; font-size: 9px; margin: 0; }
+.home-page .category-list > a > div { grid-area: 2 / 1; min-width: 0; }
+.home-page .category-list h3 { font-size: clamp(23px, 2.1vw, 28px); letter-spacing: -.045em; margin-bottom: 7px; }
+.home-page .category-list p { color: #52604d; font-size: 11px; line-height: 1.7; }
+.home-page .category-list > a > svg { grid-area: 2 / 2; margin: 2px 0 0; width: 22px; height: 22px; }
+/* Retain the directional sweep and stagger; paper feels tactile against the botanical surface. */
+.home-page .category-list > a:before { background: #f7f6f2; }
+.home-page .category-list > a:is(:hover, :focus-visible) { padding: 20px 10px 20px 18px; }
+.home-page .category-list > a:is(:hover, :focus-visible) .category-number { color: #526346; }
+.home-page .category-list > a:active:before { background: var(--lime); }
+.home-page .category-list > a:focus-visible { outline-offset: -3px; }
+.home-page .surface-seam > span:first-child {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid #a9bba1;
+}
+.home-page .surface-seam .seam-rule { background: #a1b496; }
+.home-page .surface-seam .seam-mark { background: #e2edc6; }
+@media (max-width: 1000px) {
+  .home-page .interests-layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.5fr); gap: 30px; }
+  .home-page .category-list { column-gap: 15px; }
+  .home-page .category-list h3 { font-size: 23px; }
+}
+@media (max-width: 760px) {
+  .home-page .interests { padding-block: 50px 62px; }
+  .home-page .interests:before { width: 24%; height: 10px; }
+  .home-page .interests-layout { grid-template-columns: 1fr; gap: 28px; }
+  .home-page .interests-intro { padding-right: 120px; }
+  .home-page .interests-intro h2 { font-size: 56px; }
+  .home-page .interest-star { position: absolute; right: 0; top: 14px; margin: 0; }
+  .home-page .interest-star small { display: none; }
+  .home-page .interest-star .brand-mark { width: 64px; height: 64px; }
+  .home-page .category-list { column-gap: 20px; }
+  .home-page .category-list h3 { font-size: 26px; }
+  .home-page .category-list > a { min-height: 130px; }
+}
+@media (max-width: 520px) {
+  .home-page .interests-intro { padding-right: 0; }
+  .home-page .interests-intro h2 { font-size: 52px; }
+  .home-page .interest-star { position: static; margin-top: 22px; }
+  .home-page .interest-star .brand-mark { width: 36px; height: 36px; }
+  .home-page .interest-star small { display: block; }
+  .home-page .interests-intro > p:not(.eyebrow) { max-width: 280px; }
+  .home-page .category-list { grid-template-columns: 1fr; gap: 0; }
+  .home-page .category-list > a { grid-template-columns: 22px minmax(0, 1fr) 23px; grid-template-rows: auto; gap: 14px; min-height: 102px; align-items: center; }
+  .home-page .category-number { grid-area: 1 / 1; align-self: start; margin-top: 6px; }
+  .home-page .category-list > a > div { grid-area: 1 / 2; }
+  .home-page .category-list > a > svg { grid-area: 1 / 3; margin: 0; }
+  .home-page .category-list h3 { font-size: 25px; }
+}

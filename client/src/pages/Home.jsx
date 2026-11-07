@@ -1,6 +1,7 @@
 import JourneySteps from '../components/JourneySteps';
 import CampusMarquee from '../components/CampusMarquee';
 import './HomeContinuity.css';
+import './HomeDiscovery.css';
 import BrandMark from '../components/BrandMark';
 import { Link } from 'react-router-dom';
 import Arrow from '../components/Arrow';
@@ -17,8 +18,8 @@ export default function Home() {
  <div className="hero-foot"><span>LESS SCROLLING. MORE SHOWING UP.</span><a href="#happening">Take a look around ↓</a><span>DISCOVER / CONNECT / BELONG</span></div></section>
  <CampusMarquee />
  <section className="section wrap noticeboard" id="happening"><div className="noticeboard-bridge" aria-hidden="true"><span>01</span><span>FIELD NOTES / WHAT’S NEXT</span><Arrow diagonal /></div><div className="section-heading"><div><p className="eyebrow">01 / THE CAMPUS NOTICEBOARD</p><h2><span className="noticeboard-title">Next on your radar<span className="accent-dot">.</span></span></h2></div><Link className="text-link" to="/events">All events <Arrow diagonal /></Link></div><EventResults {...results} /></section>
- <section className="interests"><div className="wrap interests-layout"><div className="interests-intro"><p className="eyebrow">02 / FOLLOW THE SPARK</p><h2>Into something?<br /><em>Get into it.</em></h2><p>A familiar passion or a completely new direction. There’s room for both.</p><span className="interest-star" aria-hidden="true"><BrandMark /></span></div><div className="category-list">{CATEGORIES.map((category, index) => <Link key={category} to={`/events?category=${encodeURIComponent(category)}`}><span className="category-number">0{index + 1}</span><div><h3>{category}</h3><p>{CATEGORY_COPY[index]}</p></div><Arrow diagonal /></Link>)}</div></div><div className="surface-seam wrap" aria-hidden="true"><span>KEEP FOLLOWING THE SPARK</span><i className="seam-rule" /><span className="seam-mark"><BrandMark /></span></div></section>
+ <section className="interests"><div className="wrap interests-layout"><div className="interests-intro"><p className="eyebrow">02 / FOLLOW THE SPARK</p><h2>Into something?<br /><em>Get into it.</em></h2><p>A familiar passion or a completely new direction. There’s room for both.</p><span className="interest-star" aria-hidden="true"><BrandMark /><small>PICK A DIRECTION.<br />SEE WHERE IT TAKES YOU.</small></span></div><div className="category-list">{CATEGORIES.map((category, index) => <Link key={category} to={`/events?category=${encodeURIComponent(category)}`}><span className="category-number">0{index + 1}</span><div><h3>{category}</h3><p>{CATEGORY_COPY[index]}</p></div><Arrow diagonal /></Link>)}</div></div><div className="surface-seam wrap" aria-hidden="true"><span>KEEP FOLLOWING THE SPARK</span><i className="seam-rule" /><span className="seam-mark"><BrandMark /></span></div></section>
  <section className="section wrap journey"><div className="section-heading"><div><p className="eyebrow">03 / FROM CURIOUS TO “I WAS THERE”</p><h2>Good things start<br />with showing up.</h2></div><p className="section-aside">You don’t need a grand plan.<br />Just a little curiosity.</p></div><JourneySteps /></section>
  <section className="closing"><div className="wrap"><p className="eyebrow">YOUR NEXT “GLAD I WENT” STARTS HERE.</p><h2>Make it a<br /><em>campus story.</em><span aria-hidden="true">↗</span></h2><div><p>There’s more to this place.<br />Go be part of it.</p><Link className="button lime" to="/events">Find your next thing <Arrow diagonal /></Link></div></div></section>
- </main><Footer /></>;
+ </main><Footer editorial /></>;
 }
