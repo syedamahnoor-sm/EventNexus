@@ -10,7 +10,7 @@ export function publishRegistrationChange(eventId, source) {
   }
 }
 export function subscribeRegistrationChange(eventId, callback, source) {
-  const receive = data => { if (data?.eventId === eventId && (!source || data.source !== source)) callback(); };
+  const receive = data => { if (data?.eventId && (!eventId || data.eventId === eventId) && (!source || data.source !== source)) callback(); };
   const listener = event => receive(event.detail);
   window.addEventListener(name, listener);
   const channel = 'BroadcastChannel' in window ? new BroadcastChannel(name) : null;

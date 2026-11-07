@@ -168,7 +168,7 @@ const getMyRegistrations = async (req, res, next) => {
         })
             .populate({
                 path: "event",
-                select: "title description location date capacity registeredCount status imageUrl imageAlt",
+                select: "title description category location date capacity registeredCount status imageUrl imageAlt",
                 populate: {
                     path: "organizer",
                     select: "name email"
