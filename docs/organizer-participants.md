@@ -1,5 +1,7 @@
 # Organizer participant management
 
+> Historical milestone notes: Milestone 9 supersedes deletion-based cancellation, active-only history assumptions and the old unique-index behavior. See [Registration lifecycle](registration-lifecycle.md) for current retention, status filters, audit/outbox and migration contracts.
+
 ## Routes and navigation
 
 - `/organizer/events/:id/participants`: private, paginated roster.

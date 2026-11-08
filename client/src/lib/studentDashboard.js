@@ -1,6 +1,8 @@
+import { activeRegistration } from './registrationLifecycle.js';
 export function groupStudentRegistrations(records, now = Date.now()) {
-  const upcoming = [], past = [], unavailable = [];
+  const upcoming = [], past = [], unavailable = [], cancelled = [];
   for (const registration of records) {
+    if (!activeRegistration(registration)) { cancelled.push(registration); continue; }
     const event = registration.event;
     const date = event && typeof event === 'object' && event.date ? new Date(event.date).getTime() : NaN;
     if (!event?._id || !Number.isFinite(date)) unavailable.push(registration);
@@ -11,7 +13,8 @@ export function groupStudentRegistrations(records, now = Date.now()) {
   const tie = (a, b) => String(a._id).localeCompare(String(b._id));
   upcoming.sort((a, b) => new Date(a.event.date) - new Date(b.event.date) || tie(a, b));
   past.sort((a, b) => new Date(b.event.date) - new Date(a.event.date) || tie(a, b));
-  return { upcoming, past, unavailable, next: upcoming[0] || null };
+  cancelled.sort((a, b) => new Date(b.cancellation?.at || b.createdAt) - new Date(a.cancellation?.at || a.createdAt) || tie(a, b));
+  return { upcoming, past, unavailable, cancelled, next: upcoming[0] || null };
 }
 
 export function registrationEventState(event) {

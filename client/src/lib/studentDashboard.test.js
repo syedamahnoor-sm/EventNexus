@@ -30,7 +30,7 @@ test('cancelled, future-completed, missing and invalid event data never inflate 
   assert.equal(dashboardEventTime('invalid'), 'Time unavailable');
 });
 test('empty registrations have honest zero counts and no next event', () => {
-  assert.deepEqual(groupStudentRegistrations([], now), { upcoming: [], past: [], unavailable: [], next: null });
+  assert.deepEqual(groupStudentRegistrations([], now), { upcoming: [], past: [], unavailable: [], cancelled: [], next: null });
 });
 test('matching dates have stable registration-reference order', () => {
   const result = groupStudentRegistrations([entry('b', 1000), entry('a', 1000), entry('d', -1000), entry('c', -1000)], now);

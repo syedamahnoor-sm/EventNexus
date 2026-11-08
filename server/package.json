@@ -24,6 +24,10 @@
     "test:auth-roles": "node --test scripts/auth-roles.test.js",
     "test:questions": "node --test scripts/registration-questions.test.js",
     "test:participants": "node --test scripts/participants.test.js",
+    "test:registration-lifecycle": "node --test scripts/registration-lifecycle.test.js",
+    "test:registration-lifecycle:integration": "node scripts/registration-lifecycle.integration.cjs",
+    "registrations:lifecycle:check": "node scripts/migrate-registration-lifecycle.js --check",
+    "registrations:lifecycle:apply": "node scripts/migrate-registration-lifecycle.js --apply",
     "avatars:cleanup": "node scripts/cleanup-avatars.js"
   },
   "keywords": [],

@@ -12,6 +12,7 @@ const requireAuth = require("../middleware/requireAuth");
 const requireRole = require("../middleware/requireRole");
 const validate = require('../middleware/validate');
 const { registerForEventSchema } = require('../validators/registrationValidation');
+const { studentCancellation, organizerCancellation } = require('../validators/cancellationValidation');
 
 const router = express.Router();
 const myRegistrationsRouter = express.Router();
@@ -31,6 +32,7 @@ router.delete(
     "/:id/register",
     requireAuth,
     requireRole("student"),
+    validate(studentCancellation),
     cancelRegistration
 );
 
@@ -52,6 +54,7 @@ router.get(
 router.get('/:id/registrations/:registrationId',
     (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); },
     requireAuth, requireRole('organizer'), require('../controllers/participantController').getEventRegistration);
+router.post('/:id/registrations/:registrationId/cancel', requireAuth, requireRole('organizer'), validate(organizerCancellation), require('../controllers/participantController').cancelParticipant);
 module.exports = {
     registrationRoutes: router,
     myRegistrationsRouter

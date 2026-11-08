@@ -1,6 +1,14 @@
 import { useEffect, useId, useRef } from 'react';
 import './OrganizerEventManagement.css';
 
+// A successful participant action can replace its trigger with a stable results
+// region before closing. Read that destination when focus is actually restored.
+function restoreDialogFocus(targetRef, fallback) {
+  const target = targetRef?.current || fallback;
+  if (target?.isConnected) target.focus();
+  else (document.querySelector('[data-event-management-result]') || document.querySelector('main'))?.focus();
+}
+
 export default function OrganizerConfirmDialog({ title, children, pending, onClose, confirm, confirmLabel, keepLabel = 'Keep event', disabled = false, returnFocus }) {
   const dialog = useRef(null), keep = useRef(null);
   const id = useId();
@@ -8,11 +16,11 @@ export default function OrganizerConfirmDialog({ title, children, pending, onClo
     const element = dialog.current, previous = returnFocus?.current || document.activeElement;
     const overflow = document.body.style.overflow;
     element.showModal(); keep.current.focus(); document.body.style.overflow = 'hidden';
-    return () => { element.close(); document.body.style.overflow = overflow; requestAnimationFrame(() => { if (previous?.isConnected) previous.focus(); else (document.querySelector('[data-event-management-result]') || document.querySelector('main'))?.focus(); }); };
+    return () => { element.close(); document.body.style.overflow = overflow; requestAnimationFrame(() => restoreDialogFocus(returnFocus, previous)); };
   }, [returnFocus]);
   function keys(event) {
     if (event.key !== 'Tab') return;
-    const buttons = [...dialog.current.querySelectorAll('button:not(:disabled),a[href]')];
+    const buttons = [...dialog.current.querySelectorAll('button:not(:disabled),a[href],textarea:not(:disabled),input:not(:disabled),select:not(:disabled)')];
     const first = buttons[0], last = buttons.at(-1);
     if (!first) { event.preventDefault(); return; }
     if (event.shiftKey && (document.activeElement === first || !buttons.includes(document.activeElement))) { event.preventDefault(); last.focus(); }

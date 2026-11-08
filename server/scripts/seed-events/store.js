@@ -1,3 +1,5 @@
+const { ACTIVE } = require('../../src/utils/registrationLifecycle');
+const CancellationOutbox = require('../../src/models/CancellationOutbox');
 const crypto = require('node:crypto');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -60,12 +62,14 @@ async function inspect(manifest, session, { cleanup = false } = {}) {
       _id: { $nin: registrationIds },
       $or: [{ event: { $in: eventIds } }, { student: { $in: userIds } }],
     }).session(session);
+    const auditHistory = await CancellationOutbox.exists({ $or: [{ event: { $in: eventIds } }, { student: { $in: userIds } }] }).session(session);
+    if (auditHistory) throw new SeedSafetyError('Cleanup refused: cancellation audit history references this cohort. No records deleted.');
     if (externalEvent || externalRegistration) {
       throw new SeedSafetyError('Cleanup refused: records not created by this seed reference the cohort. Resolve those dependencies explicitly; no records deleted.');
     }
   } else {
     const counts = await Registration.aggregate([
-      { $match: { event: { $in: eventIds } } }, { $group: { _id: '$event', total: { $sum: 1 } } },
+      { $match: { event: { $in: eventIds }, ...ACTIVE } }, { $group: { _id: '$event', total: { $sum: 1 } } },
     ]).session(session);
     for (const event of events) {
       const actual = counts.find(item => same(item._id, event._id))?.total || 0;
@@ -110,7 +114,7 @@ async function seed() {
     const users = await User.insertMany(people, { session });
     const events = await Event.insertMany(catalog.map(item => ({ ...item.event, organizer: users[0]._id })), { session });
     const registrations = await Registration.insertMany(catalog.flatMap((item, eventIndex) =>
-      users.slice(1, item.attendees + 1).map(student => ({ student: student._id, event: events[eventIndex]._id }))), { session });
+      users.slice(1, item.attendees + 1).map(student => ({ student: student._id, event: events[eventIndex]._id, status: 'active' }))), { session });
     const [manifest] = await Manifest.create([{
       _id: BATCH_ID, version: 1, demoLoginEnabled: Boolean(process.env.EVENTNEXUS_SEED_PASSWORD),
       users: users.map(user => ({ id: user._id, email: user.email, role: user.role, name: user.name, fingerprint: fingerprint(user.password) })),

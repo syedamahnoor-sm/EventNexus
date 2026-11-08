@@ -1,5 +1,7 @@
 # Student Dashboard — Milestone 3
 
+> Historical milestone notes: Milestone 9 supersedes deletion-based cancellation, active-only history assumptions and the old unique-index behavior. See [Registration lifecycle](registration-lifecycle.md) for current retention, status filters, audit/outbox and migration contracts.
+
 ## Product and routing
 
 `/student/dashboard` now renders the real Student Dashboard behind the existing student-only `ProtectedRoute`. The shared navigation labels it **My campus** and indicates the active route. Guests return through Login with the dashboard destination preserved; organizers see the existing role-mismatch explanation and never mount the student data hook. The organizer workspace remains the existing future-milestone notice.

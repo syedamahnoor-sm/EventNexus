@@ -3,12 +3,14 @@ const mongoose = require("mongoose");
 const Event = require("../models/Event");
 const Registration = require("../models/Registration");
 const { validateEventAnswers } = require('../validators/registrationQuestions');
+const { ACTIVE, assertLifecycleReady, studentRegistration } = require('../utils/registrationLifecycle');
+const { cancelRegistrationRecord } = require('../utils/cancelRegistrationRecord');
 
 const getMyEventRegistration = async (req, res, next) => {
     if (!mongoose.isObjectIdOrHexString(req.params.id)) return res.status(400).json({ message: 'Invalid event ID' });
     try {
-        const registration = await Registration.findOne({ student: req.user._id, event: req.params.id }).lean();
-        return res.status(200).json({ data: registration });
+        const filter = { student: req.user._id, event: req.params.id }; const registration = await Registration.findOne({ ...filter, ...ACTIVE }).lean() || await Registration.findOne(filter).sort({ 'cancellation.at': -1, createdAt: -1, _id: -1 }).lean();
+        return res.status(200).json({ data: studentRegistration(registration) });
     } catch (error) { next(error); }
 };
 
@@ -22,15 +24,17 @@ const registerForEvent = async (req, res, next) => {
     }
 
     try {
+        await assertLifecycleReady(Registration.collection, { allowLegacy: true });
         let createdRegistration;
 
         await mongoose.connection.transaction(async (session) => {
             // Check first so an existing registration stays recognizable even when full.
-            if (await Registration.exists({ student: req.user._id, event: id }).session(session)) {
+            if (await Registration.exists({ student: req.user._id, event: id, ...ACTIVE }).session(session)) {
                 const error = new Error('You are already registered for this event');
                 error.status = 409;
                 throw error;
             }
+            if (await Registration.exists({ student: req.user._id, event: id, status: { $in: ['cancelled_by_student', 'cancelled_by_organizer'] } }).session(session)) await assertLifecycleReady(Registration.collection);
             const current = await Event.findById(id).session(session);
             if (!current || current.status !== 'upcoming' || current.date <= new Date() || current.registeredCount >= current.capacity) throw Object.assign(new Error('Event unavailable or fully booked'), { status: 409 });
             // Validate against the authoritative definitions within the same transaction.
@@ -65,6 +69,7 @@ const registerForEvent = async (req, res, next) => {
             // Create registration within the same transaction
             const registrations = await Registration.create(
                 [{
+                    status: 'active',
                     student: req.user._id,
                     event: event._id,
                     attendee: req.body.attendee,
@@ -78,7 +83,7 @@ const registerForEvent = async (req, res, next) => {
 
         return res.status(201).json({
             message: "Registration successful",
-            data: createdRegistration
+            data: studentRegistration(createdRegistration)
         });
 
     } catch (error) {
@@ -88,7 +93,7 @@ const registerForEvent = async (req, res, next) => {
             });
         }
 
-        if (error.status === 409 || error.status === 400) {
+        if (error.status === 409 || error.status === 400 || error.status === 503) {
             return res.status(error.status).json({
                 message: error.message,
                 ...(error.code ? { code: error.code } : {}),
@@ -102,75 +107,11 @@ const registerForEvent = async (req, res, next) => {
 
 
 const cancelRegistration = async (req, res, next) => {
-    const { id } = req.params;
-    const expectedId = req.body?.registrationId;
-    if (expectedId !== undefined && !mongoose.isObjectIdOrHexString(expectedId)) {
-        return res.status(400).json({ message: 'Invalid registration reference' });
-    }
-
-    if (!mongoose.isObjectIdOrHexString(id)) {
-        return res.status(400).json({
-            message: "Invalid event ID"
-        });
-    }
-
     try {
-        await mongoose.connection.transaction(async (session) => {
-            // Delete only this student's registration
-            const registration = await Registration.findOneAndDelete(
-                {
-                    student: req.user._id,
-                    event: id,
-                    ...(expectedId ? { _id: expectedId } : {})
-                },
-                { session }
-            );
-
-            if (!registration) {
-                const error = new Error(
-                    "You are not registered for this event"
-                );
-                error.status = 404;
-                throw error;
-            }
-
-            // Release the reserved seat
-            const event = await Event.findOneAndUpdate(
-                {
-                    _id: id,
-                    status: 'upcoming',
-                    date: { $gt: new Date() },
-                    registeredCount: { $gt: 0 }
-                },
-                {
-                    $inc: { registeredCount: -1 }
-                },
-                { session, new: true }
-            );
-
-            if (!event) {
-                const error = new Error('Cancellation is unavailable. The event may have started, ended or been cancelled.');
-                error.status = 409;
-                throw error;
-            }
-        });
-
-        return res.status(200).json({
-            message: "Registration cancelled successfully"
-        });
-
-    } catch (error) {
-        if (error.status === 404 || error.status === 409) {
-            return res.status(error.status).json({
-                message: error.message
-            });
-        }
-
-        next(error);
-    }
+        const result = await cancelRegistrationRecord({ eventId: req.params.id, registrationId: req.body.registrationId, actor: req.user._id, initiator: 'student' });
+        res.json({ message: 'Registration cancelled', data: studentRegistration(result.registration), alreadyCancelled: result.alreadyCancelled });
+    } catch (error) { if ([400, 403, 404, 409, 503].includes(error.status)) return res.status(error.status).json({ message: error.message, ...(error.code ? { code: error.code } : {}) }); next(error); }
 };
-
-
 const getMyRegistrations = async (req, res, next) => {
     try {
         const registrations = await Registration.find({
@@ -189,7 +130,7 @@ const getMyRegistrations = async (req, res, next) => {
 
         return res.status(200).json({
             message: "Registrations fetched successfully",
-            data: registrations
+            data: registrations.map(studentRegistration)
         });
 
     } catch (error) {

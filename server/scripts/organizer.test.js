@@ -17,7 +17,7 @@ test('aggregation starts with session ownership and exposes counts without parti
     assert.deepEqual(pipeline[0], { $match: { organizer: owner } });
     const lookup = pipeline.find(stage => stage.$lookup).$lookup;
     assert.equal(lookup.foreignField, 'event');
-    assert.deepEqual(lookup.pipeline, [{ $count: 'total' }]);
+    assert.deepEqual(lookup.pipeline, [{ $match: { status: { $in: ['active', null] } } }, { $count: 'total' }]);
     assert.equal(pipeline[1].$project.description, undefined);
     const facets = pipeline.at(-1).$facet;
     assert.deepEqual(facets.events[1], { $sort: { date: 1, _id: 1 } });

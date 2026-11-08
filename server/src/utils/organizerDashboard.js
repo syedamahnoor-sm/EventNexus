@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const { ACTIVE } = require('./registrationLifecycle');
 
 const positive = (fallback, max) => z.string().regex(/^[1-9]\d*$/).transform(Number).pipe(z.number().int().max(max)).default(fallback);
 const dashboardQuery = z.object({
@@ -28,7 +29,7 @@ function dashboardPipeline(organizer, { view, page, limit }, now) {
             { case: { $and: [{ $eq: [{ $type: '$date' }, 'date'] }, { $in: ['$status', ['upcoming', 'completed']] }, { $lte: ['$date', now] }] }, then: 'past' }
         ], default: 'review' } } } },
         // Count records, never populate attendee snapshots or student accounts.
-        { $lookup: { from: 'registrations', localField: '_id', foreignField: 'event', pipeline: [{ $count: 'total' }], as: 'registrationTotal' } },
+        { $lookup: { from: 'registrations', localField: '_id', foreignField: 'event', pipeline: [{ $match: ACTIVE }, { $count: 'total' }], as: 'registrationTotal' } },
         { $set: { registeredCount: { $ifNull: [{ $arrayElemAt: ['$registrationTotal.total', 0] }, 0] } } },
         { $unset: 'registrationTotal' },
         { $set: { remainingSeats: { $max: [0, { $subtract: ['$capacity', '$registeredCount'] }] }, nearCapacity: { $and: [{ $eq: ['$phase', 'upcoming'] }, { $gt: ['$capacity', 0] }, { $gte: ['$registeredCount', { $multiply: ['$capacity', 0.8] }] }] } } },

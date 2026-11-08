@@ -4,7 +4,7 @@ import { participantQuery, participantValue, registrationDate, participantError 
 import { authDestination, initialLoginRole } from '../auth/authRules.js';
 
 test('roster URL state bounds pages and searches without accepting ownership controls', () => {
-  assert.deepEqual(participantQuery(new URLSearchParams('search=++Ada++&sort=oldest&page=2')), { search: 'Ada', sort: 'oldest', page: 2 });
+  assert.deepEqual(participantQuery(new URLSearchParams('search=++Ada++&sort=oldest&page=2')), { search: 'Ada', status: 'active', sort: 'oldest', page: 2 });
   for (const page of ['0', '-1', '1.2', '1000001', 'oops']) assert.equal(participantQuery(new URLSearchParams({ page })).page, 1);
   assert.equal(participantQuery(new URLSearchParams({ search: 'x'.repeat(200) })).search.length, 120);
   assert.equal(participantQuery(new URLSearchParams('sort=unsupported')).sort, 'newest');

@@ -1,3 +1,4 @@
+const { ACTIVE } = require('../utils/registrationLifecycle');
 const mongoose = require('mongoose');
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
@@ -11,7 +12,7 @@ async function getOwnedEvent(req, res, next) {
         if (!mongoose.isObjectIdOrHexString(req.params.id)) throw managementError(400, 'Invalid event ID');
         const event = await Event.findOne({ _id: req.params.id, organizer: req.user._id }).lean();
         if (!event) throw managementError(404, 'This event is unavailable in your workspace.');
-        return res.json({ data: event });
+        return res.json({ data: { ...event, hasRegistrationHistory: Boolean(await Registration.exists({ event: event._id })) } });
     } catch (error) { handleManagementError(error, res, next); }
 }
 async function findCreation(req, res, next) {
@@ -71,7 +72,7 @@ async function mutateOwnedEvent(req, res, next, action) {
             const alt = updates.imageAlt === undefined ? event.imageAlt : updates.imageAlt;
             if (action === 'edit' && image && !alt?.trim()) throw managementError(400, 'Describe the event image for people using screen readers.', 'imageAlt');
             if (updates.capacity !== undefined) {
-                const count = await Registration.countDocuments({ event: event._id }).session(session);
+                const count = await Registration.countDocuments({ event: event._id, ...ACTIVE }).session(session);
                 if (updates.capacity < Math.max(event.registeredCount, count)) throw managementError(409, 'Capacity cannot be lower than existing registrations.', 'capacity');
             }
             if (action === 'delete') {

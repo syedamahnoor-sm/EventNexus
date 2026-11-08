@@ -1,3 +1,4 @@
+import { activeRegistration } from '../lib/registrationLifecycle';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import useCancelRegistration from '../hooks/useCancelRegistration';
@@ -10,9 +11,9 @@ function ConfirmationDialog({ event, registration, onClose, onResult, refreshEve
   const keep = useRef(null);
   const error = useRef(null);
   const action = useCancelRegistration({ event, registration, refreshEvent,
-    onCancelled: () => onResult(null, 'cancelled'),
+    onCancelled: record => { onResult(record, 'cancelled'); refreshRegistration(); },
     onReconciled: record => {
-      if (!record) onResult(null, 'absent');
+      if (!record || !activeRegistration(record)) onResult(record, 'absent');
       else if (record._id !== registration._id) onResult(record, 'replaced');
     },
   });
@@ -72,7 +73,7 @@ export default function CancelRegistration({ event, registration, onResult, refr
   if (auth.status !== 'ready') return <p className="cancellation-closed" role="status">Verify your session before managing your registration.</p>;
   return <div className="registration-cancellation">
     {!registration && notice && <p className="cancel-success" data-cancellation-result tabIndex={-1} role="status">{notice}</p>}
-    {registration && (eligible ? <button type="button" ref={trigger} className="cancel-trigger" disabled={disabled} onClick={() => setOpen(true)}>Cancel registration</button> : <p className="cancellation-closed">Cancellation is closed for this event. Your registration remains on record.</p>)}
+    {activeRegistration(registration) && (eligible ? <button type="button" ref={trigger} className="cancel-trigger" disabled={disabled} onClick={() => setOpen(true)}>Cancel registration</button> : <p className="cancellation-closed">Cancellation is closed for this event. Your registration remains on record.</p>)}
     {open && registration && <ConfirmationDialog event={event} registration={registration} onClose={() => setOpen(false)} onResult={result} refreshEvent={refreshEvent} refreshRegistration={refreshRegistration} returnFocus={trigger} />}
   </div>;
 }

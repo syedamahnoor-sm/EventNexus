@@ -1,5 +1,7 @@
 # Student registration cancellation — Milestone 2
 
+> Historical milestone notes: Milestone 9 supersedes deletion-based cancellation, active-only history assumptions and the old unique-index behavior. See [Registration lifecycle](registration-lifecycle.md) for current retention, status filters, audit/outbox and migration contracts.
+
 ## Existing architecture and policy
 
 The existing Registration model represents **active registrations only**. Its established cancellation endpoint removes the current student's registration in a transaction, then decrements the event count. There is no cancelled-status field, cancellation timestamp, retained snapshot history or audit collection. This milestone retains that deletion policy rather than creating a parallel registration/history system. Successful cancellation removes the registration-time attendee snapshot along with its owning registration. No migration or seed rewrite is performed.

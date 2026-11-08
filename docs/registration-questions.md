@@ -1,5 +1,7 @@
 # Event-specific registration questions
 
+> Historical milestone notes: Milestone 9 supersedes deletion-based cancellation, active-only history assumptions and the old unique-index behavior. See [Registration lifecycle](registration-lifecycle.md) for current retention, status filters, audit/outbox and migration contracts.
+
 Organizers configure questions in the existing event editor. The dashboard welcome area exposes Create event and Manage events; each owned event retains visible editing, details and lifecycle controls.
 
 ## Persistence and API
