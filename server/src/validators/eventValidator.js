@@ -1,5 +1,6 @@
 const { z } = require("zod");
 const { isEventImageUrl } = require('./imageUrl');
+const { questionsSchema } = require('./registrationQuestions');
 const eventCategory = z.enum(['Technology', 'Workshops', 'Competitions', 'Career', 'Community', 'Other']);
 
 const eventFieldsSchema = z.strictObject({
@@ -16,6 +17,7 @@ const eventFieldsSchema = z.strictObject({
 
     capacity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
     category: eventCategory.default("Other"),
+    registrationQuestions: questionsSchema.optional(),
 });
 const createEventSchema = eventFieldsSchema.superRefine((data, ctx) => {
     if (data.imageUrl && !data.imageAlt) ctx.addIssue({ code: 'custom', path: ['imageAlt'], message: 'Describe the event image for people using screen readers' });

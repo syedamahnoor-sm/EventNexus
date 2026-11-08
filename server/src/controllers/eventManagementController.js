@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
 const { createEventSchema, updateEventSchema } = require('../validators/eventValidator');
+const { plainQuestions } = require('../validators/registrationQuestions');
 const { UUID, managementError, expectedEventVersion, assertFutureDate, assertEditable, creationFingerprint, publicEvent, handleManagementError } = require('../utils/eventManagement');
 
 async function getOwnedEvent(req, res, next) {
@@ -39,7 +40,7 @@ async function createEvent(req, res, next) {
         if (existing) return res.status(200).json({ message: 'Event creation confirmed', event: publicEvent(existing) });
         assertFutureDate(result.data.date);
         let event;
-        try { event = await Event.create({ ...result.data, organizer: req.user._id, ...(key ? { creationKey: key, creationFingerprint: fingerprint } : {}) }); }
+        try { event = await Event.create({ ...result.data, registrationQuestionsVersion: result.data.registrationQuestions?.length ? 1 : 0, organizer: req.user._id, ...(key ? { creationKey: key, creationFingerprint: fingerprint } : {}) }); }
         catch (error) { if (error.code !== 11000 || !key) throw error; event = await replay(); if (!event) throw error; }
         return res.status(201).json({ message: 'Event created successfully', event: publicEvent(event) });
     } catch (error) { handleManagementError(error, res, next); }
@@ -64,6 +65,8 @@ async function mutateOwnedEvent(req, res, next, action) {
             if (!event.organizer.equals(req.user._id)) throw managementError(403, 'You can only manage your own events.');
             if (action === 'cancel' && event.status === 'cancelled') { saved = event; return; }
             assertEditable(event, version);
+            const questionsChanged = updates.registrationQuestions !== undefined && JSON.stringify(plainQuestions(event.registrationQuestions)) !== JSON.stringify(updates.registrationQuestions);
+            if (questionsChanged && req.get('X-Confirm-Question-Changes') !== 'true' && await Registration.exists({ event: event._id }).session(session)) throw managementError(409, 'Existing registrations are preserved. Acknowledge the question changes before saving.', 'registrationQuestions');
             const image = updates.imageUrl === undefined ? event.imageUrl : updates.imageUrl;
             const alt = updates.imageAlt === undefined ? event.imageAlt : updates.imageAlt;
             if (action === 'edit' && image && !alt?.trim()) throw managementError(400, 'Describe the event image for people using screen readers.', 'imageAlt');
@@ -77,7 +80,7 @@ async function mutateOwnedEvent(req, res, next, action) {
                 if (!deleted.deletedCount) throw managementError(409, 'The event changed. Refresh before trying again.');
                 return;
             }
-            saved = await Event.findOneAndUpdate({ _id: event._id, organizer: req.user._id, __v: event.__v, status: 'upcoming', date: { $gt: new Date() }, ...(updates.capacity === undefined ? {} : { registeredCount: { $lte: updates.capacity } }) }, { $set: action === 'cancel' ? { status: 'cancelled' } : updates, $inc: { __v: 1 } }, { session, returnDocument: 'after', runValidators: true });
+            saved = await Event.findOneAndUpdate({ _id: event._id, organizer: req.user._id, __v: event.__v, status: 'upcoming', date: { $gt: new Date() }, ...(updates.capacity === undefined ? {} : { registeredCount: { $lte: updates.capacity } }) }, { $set: action === 'cancel' ? { status: 'cancelled' } : { ...updates, ...(questionsChanged ? { registrationQuestionsVersion: (event.registrationQuestionsVersion || 0) + 1 } : {}) }, $inc: { __v: 1 } }, { session, returnDocument: 'after', runValidators: true });
             if (!saved) throw managementError(409, 'The event changed or has started. Refresh before trying again.');
         });
         return res.json({ message: action === 'delete' ? 'Event deleted successfully' : action === 'cancel' ? 'Event cancelled. Existing registration records are preserved.' : 'Event updated successfully', ...(saved ? { data: publicEvent(saved) } : {}) });

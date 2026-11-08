@@ -22,6 +22,7 @@
     "test:organizer": "node --test scripts/organizer.test.js",
     "test:event-management": "node --test scripts/event-management.test.js",
     "test:auth-roles": "node --test scripts/auth-roles.test.js",
+    "test:questions": "node --test scripts/registration-questions.test.js",
     "avatars:cleanup": "node scripts/cleanup-avatars.js"
   },
   "keywords": [],

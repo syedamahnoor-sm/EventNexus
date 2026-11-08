@@ -1,10 +1,13 @@
 
 const mongoose = require("mongoose");
 const studentDetailsSchema = require('./studentDetailsSchema');
+const { snapshotSchema, snapshotsValid } = require('./registrationQuestionSchemas');
 
 const registrationSchema = new mongoose.Schema(
     {
         attendee: { type: studentDetailsSchema, default: undefined },
+        answers: { type: [snapshotSchema], default: undefined, immutable: true, validate: { validator: snapshotsValid, message: 'Invalid answer snapshots' } },
+        questionVersion: { type: Number, min: 0, validate: Number.isSafeInteger, immutable: true },
         student: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

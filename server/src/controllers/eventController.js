@@ -128,6 +128,7 @@ const getAllEvents = async (req, res, next) => {
 
         const [events, total] = await Promise.all([
             Event.find(filter)
+                .select('-registrationQuestions -registrationQuestionsVersion')
                 .populate("organizer", "name")
                 .sort({
                     date: sort === "soonest" ? 1 : -1,

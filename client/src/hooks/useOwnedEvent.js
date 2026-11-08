@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../api/axios';
 import { subscribeEventChange } from '../lib/eventChanges';
+import { subscribeRegistrationChange } from '../lib/registrationEvents';
 
 export default function useOwnedEvent(id) {
   const [version, setVersion] = useState(0);
@@ -8,6 +9,7 @@ export default function useOwnedEvent(id) {
   const reload = useCallback(() => setVersion(value => value + 1), []);
   const valid = /^[a-f\d]{24}$/i.test(id || '');
   useEffect(() => subscribeEventChange(id, reload), [id, reload]);
+  useEffect(() => subscribeRegistrationChange(id, reload), [id, reload]);
   useEffect(() => {
     if (!valid) return;
     const controller = new AbortController();

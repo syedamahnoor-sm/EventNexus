@@ -1,6 +1,7 @@
 
 const mongoose = require("mongoose");
 const { isEventImageUrl } = require('../validators/imageUrl');
+const { definitionSchema, definitionsValid } = require('./registrationQuestionSchemas');
 
 const eventSchema = new mongoose.Schema(
     {
@@ -26,6 +27,8 @@ const eventSchema = new mongoose.Schema(
         },
 
         imageAlt: { type: String, trim: true, maxlength: 200 },
+        registrationQuestions: { type: [definitionSchema], default: undefined, validate: { validator: definitionsValid, message: 'Invalid registration questions' } },
+        registrationQuestionsVersion: { type: Number, default: 0, min: 0, validate: Number.isSafeInteger },
 
         // Optional, server-owned creation recovery metadata; never public event content.
         creationKey: { type: String, select: false, match: /^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i },

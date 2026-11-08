@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const { submittedAnswersSchema } = require('./registrationQuestions');
 
 // Free-text academic identifiers accommodate different university conventions.
 const phonePattern = /^\+?[\d\s().-]+$/;
@@ -11,5 +12,5 @@ const attendeeSchema = z.object({
     contactNumber: z.string().trim().max(40).refine(value => !value || (phonePattern.test(value) && value.replace(/\D/g, '').length >= 7 && value.replace(/\D/g, '').length <= 15), 'Use 7–15 digits with optional +, spaces, parentheses or hyphens').optional()
 }).strict();
 
-const registerForEventSchema = z.object({ attendee: attendeeSchema }).strict();
+const registerForEventSchema = z.object({ attendee: attendeeSchema, answers: submittedAnswersSchema.optional(), questionVersion: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional() }).strict();
 module.exports = { attendeeSchema, registerForEventSchema, phonePattern };
