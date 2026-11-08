@@ -2,3 +2,4 @@
 @keyframes organizer-dialog-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(max-width:600px){.organizer-confirm-dialog{padding:26px 24px}.organizer-confirm-dialog h2{font-size:46px}.organizer-confirm-buttons{flex-direction:column}.organizer-confirm-buttons>.button{width:100%}}
 @media(prefers-reduced-motion:reduce){.organizer-confirm-dialog{animation:none}.organizer-event-management-links>a,.organizer-event-management-links>button{transition:none}}
+.organizer-participants-link{display:inline-flex;min-height:44px;align-items:center;font-size:12px;font-weight:600;margin-bottom:8px}.editor-participants-link{display:inline-flex;min-height:44px;align-items:center;margin-bottom:20px;font-size:12px}

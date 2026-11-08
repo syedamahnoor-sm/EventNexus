@@ -33,6 +33,7 @@ registrationSchema.index(
 
 // Efficiently retrieve students registered for an event
 registrationSchema.index({ event: 1 });
+registrationSchema.index({ event: 1, createdAt: -1, _id: -1 });
 
 module.exports = mongoose.model(
     "Registration",

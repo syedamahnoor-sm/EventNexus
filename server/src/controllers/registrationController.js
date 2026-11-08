@@ -198,61 +198,10 @@ const getMyRegistrations = async (req, res, next) => {
 };
 
 
-const getEventRegistrations = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-
-        if (!mongoose.isObjectIdOrHexString(id)) {
-            return res.status(400).json({
-                message: "Invalid event ID"
-            });
-        }
-
-        // Find the event and verify ownership
-        const event = await Event.findById(id)
-            .select("title organizer capacity registeredCount");
-
-        if (!event) {
-            return res.status(404).json({
-                message: "Event not found"
-            });
-        }
-
-        if (!event.organizer.equals(req.user._id)) {
-            return res.status(403).json({
-                message: "You can only view registrations for your own events"
-            });
-        }
-
-        // Fetch registered students
-        const registrations = await Registration.find({
-            event: id
-        })
-            .populate("student", "name email")
-            .sort({ createdAt: -1 })
-            .lean();
-
-        return res.status(200).json({
-            message: "Event registrations fetched successfully",
-            event: {
-                id: event._id,
-                title: event.title,
-                capacity: event.capacity,
-                registeredCount: event.registeredCount
-            },
-            data: registrations,
-            total: registrations.length
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
-
 module.exports = {
     getMyEventRegistration,
     registerForEvent,
     cancelRegistration,
     getMyRegistrations,
-    getEventRegistrations
+    getEventRegistrations: require('./participantController').getEventRegistrations
 };

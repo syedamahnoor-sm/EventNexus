@@ -56,6 +56,7 @@ export default function OrganizerEventActions({ event, onChange, onDelete, disab
     if (!record) onDelete?.(message);
   }
   return <div className="organizer-event-management">
+    <Link className="text-link organizer-participants-link" to={`/organizer/events/${event._id}/participants`}>Manage participants ↗</Link>
     {notice && <p role="status" tabIndex={-1} data-event-management-result>{notice}</p>}
     {canManageEvent(event) && <div className="organizer-event-management-links"><Link className="organizer-edit-link" to={`/organizer/events/${event._id}/edit`}>Edit event ↗</Link><button type="button" disabled={disabled} onClick={e => { trigger.current = e.currentTarget; setAction('cancel'); }}>Cancel event</button>{event.registeredCount === 0 && <button className="organizer-delete-trigger" type="button" disabled={disabled} onClick={e => { trigger.current = e.currentTarget; setAction('delete'); }}>Delete event</button>}</div>}
     {action && <LifecycleDialog returnFocus={trigger} event={event} action={action} close={() => setAction(null)} complete={complete} />}

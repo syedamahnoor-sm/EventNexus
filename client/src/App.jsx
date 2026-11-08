@@ -15,11 +15,17 @@ import Register from "./pages/Register";
 import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
 import OrganizerDashboard from './pages/OrganizerDashboard';
+import { lazy, Suspense } from 'react';
 import OrganizerEventEditor from './pages/OrganizerEventEditor';
 import EventDetails from "./pages/EventDetails";
 import EventRegistrationPage from './pages/EventRegistrationPage';
 import StudentDashboard from './pages/StudentDashboard';
 import StudentProfile from './pages/StudentProfile';
+
+const OrganizerParticipants = lazy(() => import('./pages/OrganizerParticipants'));
+function ParticipantRoute() {
+    return <ProtectedRoute role="organizer"><Suspense fallback={<main id="main" className="account-state wrap" role="status"><h1>Opening your roster.</h1><p>One moment…</p></main>}><OrganizerParticipants /></Suspense></ProtectedRoute>;
+}
 
 export default function App() {
     return (
@@ -37,6 +43,8 @@ export default function App() {
                 <Route path="/student/profile" element={<ProtectedRoute role="student"><StudentProfile /></ProtectedRoute>} />
                 <Route path="/organizer/events/new" element={<ProtectedRoute role="organizer"><OrganizerEventEditor /></ProtectedRoute>} />
                 <Route path="/organizer/events/:id/edit" element={<ProtectedRoute role="organizer"><OrganizerEventEditor /></ProtectedRoute>} />
+                <Route path="/organizer/events/:id/participants" element={<ParticipantRoute />} />
+                <Route path="/organizer/events/:id/participants/:registrationId" element={<ParticipantRoute />} />
                 <Route
                     path="/student/dashboard"
                     element={<ProtectedRoute role="student"><StudentDashboard /></ProtectedRoute>}

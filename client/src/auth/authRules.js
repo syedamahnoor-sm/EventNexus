@@ -40,7 +40,7 @@ export function authDestination(from, role) {
   if (/^\/events\/[a-f\d]{24}\/register$/i.test(pathname) && role === 'student') return path;
   if (pathname === `/${role}/dashboard` && ['student', 'organizer'].includes(role)) return path;
   if (pathname === '/student/profile' && role === 'student') return path;
-  if (role === 'organizer' && (pathname === '/organizer/events/new' || /^\/organizer\/events\/[a-f\d]{24}\/edit$/i.test(pathname))) return path;
+  if (role === 'organizer' && (pathname === '/organizer/events/new' || /^\/organizer\/events\/[a-f\d]{24}\/(?:edit|participants(?:\/[a-f\d]{24})?)$/i.test(pathname))) return path;
   return fallback;
 }
 
@@ -48,5 +48,5 @@ export function initialLoginRole(state) {
   if (state?.registered) return 'student';
   if (['student', 'organizer'].includes(state?.role)) return state.role;
   const from = typeof state?.from === 'string' ? state.from.split(/[?#]/)[0] : state?.from?.pathname;
-  return from === '/organizer/dashboard' || from === '/organizer/events/new' || /^\/organizer\/events\/[a-f\d]{24}\/edit$/i.test(from || '') ? 'organizer' : 'student';
+  return from === '/organizer/dashboard' || from === '/organizer/events/new' || /^\/organizer\/events\/[a-f\d]{24}\/(?:edit|participants(?:\/[a-f\d]{24})?)$/i.test(from || '') ? 'organizer' : 'student';
 }

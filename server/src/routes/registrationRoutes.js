@@ -44,10 +44,14 @@ myRegistrationsRouter.get(
 
 router.get(
     "/:id/registrations",
+    (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); },
     requireAuth,
     requireRole("organizer"),
     getEventRegistrations
 );
+router.get('/:id/registrations/:registrationId',
+    (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); },
+    requireAuth, requireRole('organizer'), require('../controllers/participantController').getEventRegistration);
 module.exports = {
     registrationRoutes: router,
     myRegistrationsRouter
