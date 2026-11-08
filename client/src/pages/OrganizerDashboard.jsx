@@ -1,5 +1,5 @@
-﻿import { useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import useOrganizerDashboard from '../hooks/useOrganizerDashboard';
 import { organizerQuery, organizerStatus } from '../lib/organizerDashboard';
@@ -22,6 +22,8 @@ const emptyCopy = {
 function Workspace() {
   const { user } = useAuth();
   const [params, setParams] = useSearchParams();
+  const { state } = useLocation();
+  const [notice, setNotice] = useState(state?.managementNotice || '');
   const query = organizerQuery(params);
   const dashboard = useOrganizerDashboard(query);
   const payload = dashboard.data;
@@ -40,7 +42,8 @@ function Workspace() {
   }
   return <main id="main" tabIndex={-1} className="organizer-dashboard wrap">
     <header className="organizer-welcome entrance"><div><p className="eyebrow">YOUR EVENTNEXUS / ORGANIZER WORKSPACE</p><p className="organizer-greeting">The floor is yours, <strong>{user.name}.</strong></p><h1>Set the scene.<br /><em>Make a moment.</em></h1></div><div className="organizer-welcome-aside"><BrandMark /><p>Make the next great<br /> campus moment happen.</p><a className="text-link" href="#organizer-events">Your events, at a glance <Arrow diagonal /></a></div></header>
-    <div className="organizer-workspace-line"><span>THE IDEAS. THE PLANS. THE PEOPLE.</span><button type="button" onClick={dashboard.refresh} disabled={dashboard.loading}>{dashboard.loading ? 'Refreshing workspace…' : 'Refresh workspace'} <Arrow /></button></div>
+    <div className="organizer-workspace-line"><Link className="organizer-create-link" to="/organizer/events/new">Create event <Arrow diagonal /></Link><button type="button" onClick={dashboard.refresh} disabled={dashboard.loading}>{dashboard.loading ? 'Refreshing workspace…' : 'Refresh workspace'} <Arrow /></button></div>
+    {notice && <p className="organizer-management-success" role="status" tabIndex={-1} data-event-management-result>{notice}</p>}
     {dashboard.error && <div className="organizer-error" role="alert"><p>{payload ? 'We couldn’t refresh your workspace. The events below are the last loaded snapshot; totals are paused until we reconnect.' : 'Your workspace couldn’t be loaded. Check your connection and try again.'}</p><button className="text-link" type="button" onClick={dashboard.refresh} disabled={dashboard.loading}>Try again <Arrow /></button></div>}
     <section className="organizer-overview" aria-label="Your organizer overview" aria-busy={dashboard.loading}>
       <div className="organizer-total"><span className="eyebrow">IN YOUR HANDS</span><strong data-metric="total">{overview ? overview.total : '—'}</strong><span>events created</span></div>
@@ -56,7 +59,7 @@ function Workspace() {
         <div className="organizer-filter-line"><div className="organizer-views" role="group" aria-label="Event lifecycle filters">{Object.entries(views).filter(([key]) => key !== 'review' || payload.data.overview.review > 0 || query.view === 'review').map(([key, label]) => <button key={key} type="button" aria-pressed={query.view === key} onClick={() => change(key)}>{label}<span>{payload.data.overview[key]}</span></button>)}</div><p role="status" aria-live="polite">{dashboard.loading ? 'Updating events…' : `${pagination.total} ${pagination.total === 1 ? 'event' : 'events'} · ${query.view === 'upcoming' ? 'nearest first' : query.view === 'review' ? 'date order' : 'most recent first'}`}</p></div>
         {query.view === 'past' && <p className="organizer-list-note">Past means the scheduled start has passed. Registrations are not verified attendance.</p>}
         {query.view === 'review' && <p className="organizer-list-note">These records have an unconfirmed date or a lifecycle status that doesn’t match the scheduled date. They aren’t counted as upcoming or past.</p>}
-        {dashboard.changing ? <div className="organizer-skeleton organizer-skeleton--list" role="status"><span className="sr-only">Loading this chapter</span><div /><div /></div> : payload.data.events.length ? <div className="organizer-event-list" key={`${query.view}:${query.page}`}>{payload.data.events.map(event => <OrganizerEventEntry key={event._id} event={event} />)}</div> : <div className="organizer-empty"><span aria-hidden="true">↗</span><div><h3>{query.page > 1 ? 'You’ve reached the end of this chapter.' : emptyCopy[query.view][0]}</h3><p>{query.page > 1 ? 'There are no events on this page. Return to the first page to see the latest list.' : emptyCopy[query.view][1]}</p>{query.page > 1 ? <button className="text-link" type="button" onClick={() => change(query.view)}>Back to the first page <Arrow /></button> : <Link className="text-link" to="/events">Explore campus events <Arrow diagonal /></Link>}</div></div>}
+        {dashboard.changing ? <div className="organizer-skeleton organizer-skeleton--list" role="status"><span className="sr-only">Loading this chapter</span><div /><div /></div> : payload.data.events.length ? <div className="organizer-event-list" key={`${query.view}:${query.page}`}>{payload.data.events.map(event => <OrganizerEventEntry key={event._id} event={event} disabled={dashboard.error || dashboard.loading} onChange={(_, message) => setNotice(message)} />)}</div> : <div className="organizer-empty"><span aria-hidden="true">↗</span><div><h3>{query.page > 1 ? 'You’ve reached the end of this chapter.' : emptyCopy[query.view][0]}</h3><p>{query.page > 1 ? 'There are no events on this page. Return to the first page to see the latest list.' : emptyCopy[query.view][1]}</p>{query.page > 1 ? <button className="text-link" type="button" onClick={() => change(query.view)}>Back to the first page <Arrow /></button> : <Link className="text-link" to="/events">Explore campus events <Arrow diagonal /></Link>}</div></div>}
         {(pagination.totalPages > 1 || query.page > 1) && <nav className="organizer-pagination" aria-label="Your events pagination"><button className="text-link" type="button" disabled={query.page === 1 || dashboard.loading} onClick={() => change(query.view, query.page - 1)}>← Previous</button><span>Page {query.page}{pagination.totalPages > 0 ? ` of ${pagination.totalPages}` : ''}</span><button className="text-link" type="button" disabled={!pagination.hasNextPage || dashboard.loading} onClick={() => change(query.view, query.page + 1)}>Next <Arrow /></button></nav>}
       </section>
     </>}

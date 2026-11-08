@@ -79,7 +79,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
 
         // Find user by email
         const user = await User.findOne({ email });
@@ -99,6 +99,16 @@ const loginUser = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({
                 message: "Invalid email or password"
+            });
+        }
+
+        // Check only after credentials, so a failed password never discloses role.
+        // Do not regenerate, assign userId, or replace a session on a mismatch.
+        if (role !== undefined && role !== user.role) {
+            return res.status(403).json({
+                code: 'ROLE_MISMATCH',
+                message: 'Choose the login option that matches your existing account.',
+                accountRole: user.role
             });
         }
 

@@ -26,7 +26,10 @@ const loginSchema = z.object({
         .toLowerCase(),
 
     password: z.string()
-        .min(1, "Password is required")
+        .min(1, "Password is required"),
+    // Optional for existing API clients. The login UI always submits its choice.
+    // This is an assertion about an existing account, never a requested privilege.
+    role: z.enum(['student', 'organizer']).optional()
 }).strict();
 
 module.exports = { registerSchema, loginSchema };

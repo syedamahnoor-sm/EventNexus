@@ -21,7 +21,7 @@ function dashboardPipeline(organizer, { view, page, limit }, now) {
     const count = condition => ({ $sum: { $cond: [condition, 1, 0] } });
     return [
         { $match: { organizer } },
-        { $project: { title: 1, category: 1, date: 1, location: 1, status: 1, capacity: 1, imageUrl: 1, imageAlt: 1 } },
+        { $project: { title: 1, category: 1, date: 1, location: 1, status: 1, capacity: 1, imageUrl: 1, imageAlt: 1, __v: 1 } },
         { $set: { phase: { $switch: { branches: [
             { case: { $eq: ['$status', 'cancelled'] }, then: 'cancelled' },
             { case: { $and: [{ $eq: [{ $type: '$date' }, 'date'] }, { $eq: ['$status', 'upcoming'] }, { $gt: ['$date', now] }] }, then: 'upcoming' },

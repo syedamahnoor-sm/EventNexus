@@ -2,7 +2,7 @@ const { z } = require("zod");
 const { isEventImageUrl } = require('./imageUrl');
 const eventCategory = z.enum(['Technology', 'Workshops', 'Competitions', 'Career', 'Community', 'Other']);
 
-const createEventSchema = z.strictObject({
+const eventFieldsSchema = z.strictObject({
     title: z.string().trim().min(3).max(120),
 
     description: z.string().trim().min(10).max(2000),
@@ -14,12 +14,15 @@ const createEventSchema = z.strictObject({
 
     date: z.iso.datetime({ offset: true }),
 
-    capacity: z.number().int().min(1),
+    capacity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
     category: eventCategory.default("Other"),
+});
+const createEventSchema = eventFieldsSchema.superRefine((data, ctx) => {
+    if (data.imageUrl && !data.imageAlt) ctx.addIssue({ code: 'custom', path: ['imageAlt'], message: 'Describe the event image for people using screen readers' });
 });
 
 // Zod defaults still run inside partial objects. An image-only PATCH must not reset category.
-const updateEventSchema = createEventSchema.partial().extend({ category: eventCategory.optional() }).refine(
+const updateEventSchema = eventFieldsSchema.partial().extend({ category: eventCategory.optional() }).refine(
     (data) => Object.keys(data).length > 0,
     {
         message: "At least one field must be provided"

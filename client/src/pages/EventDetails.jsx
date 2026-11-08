@@ -1,12 +1,14 @@
 import EventHistoryPanel from '../components/EventHistoryPanel';
 import EventRecap from '../components/EventRecap';
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Arrow from '../components/Arrow';
 import BrandMark from '../components/BrandMark';
 import EventArtwork from '../components/EventArtwork';
 import EventRegistration from '../components/EventRegistration';
 import Footer from '../components/Footer';
+import OrganizerEventActions from '../components/OrganizerEventActions';
+import { useAuth } from '../auth/AuthContext';
 import useEventDetails from '../hooks/useEventDetails';
 import { eventAvailability, isPastEvent, hasEventRecap } from '../lib/eventAvailability';
 import './EventDetails.css';
@@ -23,6 +25,9 @@ function dateLabels(value) {
 function DetailsContent({ id }) {
   const { event, error, loading, refresh } = useEventDetails(id);
   const { state, hash } = useLocation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const owns = user?.role === 'organizer' && event?.organizer?._id === user.id;
   const [now, setNow] = useState(() => Date.now());
   const historical = Boolean(event && isPastEvent(event, now));
   const showRecap = historical && hasEventRecap(event);
@@ -63,9 +68,11 @@ function DetailsContent({ id }) {
   const availability = eventAvailability(event, now);
   const labels = dateLabels(event.date);
   return <><main className="event-details wrap" id="main" tabIndex={-1}>
+    {state?.managementNotice && <p className="organizer-management-success" role="status">{state.managementNotice}</p>}
     <nav className="details-breadcrumb" aria-label="Breadcrumb"><Link to={back}>← {back.startsWith('/events/past') ? 'Back to previous events' : 'Back to events'}</Link><span>{historical ? 'THE EVENTNEXUS ARCHIVE / EVENT RECORD' : 'THE CAMPUS NOTICEBOARD / EVENT DETAILS'}</span></nav>
     <header className="details-header entrance"><div className="details-kicker"><Link to={`/events?category=${encodeURIComponent(event.category || 'Other')}`}>{event.category || 'Other'} <Arrow diagonal /></Link><span className={`details-status status-${availability.state}`}>{availability.title}</span></div><h1>{event.title}</h1><p className="details-organizer">Organized by <strong>{event.organizer?.name || 'Organizer information unavailable'}</strong></p></header>
     {error && <div className="details-refresh-error" role="alert">We couldn’t refresh event availability. Displayed information may have changed. <button onClick={refresh} disabled={loading}>{loading ? 'Refreshing…' : 'Try again'}</button></div>}
+    {owns && <section className="details-owner-controls" aria-label="Manage your event"><p className="eyebrow">YOUR EVENT / ORGANIZER CONTROLS</p><OrganizerEventActions event={event} disabled={Boolean(error) || loading} onDelete={message => navigate('/organizer/dashboard', { state: { managementNotice: message } })} /></section>}
     <div className="details-layout"><div className="details-story">
       <div className="details-poster"><EventArtwork category={event.category} imageUrl={event.imageUrl} imageAlt={event.imageAlt} priority className="details-art" /><div className="details-poster-caption"><span>{event.imageUrl ? 'ILLUSTRATIVE PHOTOGRAPH' : 'CAMPUS LIFE. WIDE OPEN.'}</span><span>{historical ? 'CAMPUS REWIND / EVENT RECORD' : 'SHOW UP / BE PART OF IT'}</span></div></div>
       <section className="details-facts" aria-labelledby="details-facts-heading"><h2 id="details-facts-heading" className="sr-only">At a glance</h2><dl><div><dt>01 / DATE & TIME</dt><dd><time dateTime={Number.isFinite(new Date(event.date).getTime()) ? event.date : undefined}>{labels.date}<span>{labels.time}</span></time><small>Shown in your local time zone.</small></dd></div><div><dt>02 / THE MEETING POINT</dt><dd>{event.location || 'Location to be announced'}</dd></div><div><dt>03 / THE ROOM</dt><dd>{availability.capacity ? `${availability.capacity} total places` : 'Capacity unconfirmed'}<span>{historical ? 'Registration closed' : availability.remaining === null ? 'Availability unconfirmed' : `${availability.remaining} places remaining`}</span></dd></div></dl></section>

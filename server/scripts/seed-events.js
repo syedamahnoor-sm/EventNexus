@@ -4,6 +4,7 @@ const { assertDevelopment, SeedSafetyError } = require('./seed-events/safety');
 const { BATCH_ID, DISTRIBUTION, buildCatalog } = require('./seed-events/catalog');
 
 async function main() {
+  
   require('dotenv').config({ path: path.join(__dirname, '../.env'), quiet: true });
   const mode = process.argv[2] || 'seed';
   if (!['seed', 'cleanup', 'verify', 'images', 'archive', 'archive-cleanup', 'archive-verify'].includes(mode) || process.argv.length > 3) throw new SeedSafetyError('Unsupported seed command; unexpected arguments are refused.');

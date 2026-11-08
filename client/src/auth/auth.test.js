@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { authDestination, authFeedback, validateAuth } from './authRules.js';
+import { authDestination, authFeedback, initialLoginRole, validateAuth } from './authRules.js';
 import { createAuthClient } from './authClient.js';
 
 test('registration validates names, email, confirmation and bcrypt UTF-8 byte limit', () => {
@@ -15,11 +15,32 @@ test('registration validates names, email, confirmation and bcrypt UTF-8 byte li
 });
 
 test('return destinations preserve known routes and role, reject external/looping paths', () => {
-  for (const bad of ['https://example.com', '//example.com', '/login', '/register', '/events/../login', '/events\\evil', '/events\n']) assert.equal(authDestination(bad, 'student'), '/events');
-  assert.equal(authDestination('/student/dashboard', 'organizer'), '/events');
+  for (const bad of ['https://example.com', '//example.com', '/login', '/register', '/events/../login', '/events\\evil', '/events\n']) assert.equal(authDestination(bad, 'student'), '/student/dashboard');
+  assert.equal(authDestination('/student/dashboard', 'organizer'), '/organizer/dashboard');
   assert.equal(authDestination('/organizer/dashboard', 'organizer'), '/organizer/dashboard');
   assert.equal(authDestination('/events/past?category=Career', 'student'), '/events/past?category=Career');
   assert.equal(authDestination({ pathname: '/events', search: '?page=2' }), '/events?page=2');
+});
+
+test('both account types default to their own workspace and only known return paths influence the selector', () => {
+  assert.equal(authDestination(null, 'student'), '/student/dashboard');
+  assert.equal(authDestination(null, 'organizer'), '/organizer/dashboard');
+  assert.equal(authDestination('/organizer/dashboard', 'student'), '/student/dashboard');
+  assert.equal(initialLoginRole(), 'student');
+  assert.equal(initialLoginRole({ role: 'organizer' }), 'organizer');
+  assert.equal(initialLoginRole({ from: '/organizer/dashboard?page=2' }), 'organizer');
+  assert.equal(initialLoginRole({ from: 'https://evil.example/organizer/dashboard' }), 'student');
+  assert.equal(initialLoginRole({ role: 'organizer', registered: true }), 'student');
+  assert.equal(initialLoginRole({ from: '/organizer/unknown' }), 'student');
+});
+
+test('role mismatch feedback is distinct from CSRF and invalid credentials', () => {
+  const failure = { response: { status: 403, data: { code: 'ROLE_MISMATCH', accountRole: 'organizer' } } };
+  assert.match(authFeedback(failure, 'login').message, /Organizer/);
+  assert.ok(authFeedback(failure, 'login').fields.role);
+  assert.match(authFeedback({ response: { status: 403, data: { message: 'Invalid or missing CSRF token' } } }, 'login').message, /security check/);
+  assert.ok(validateAuth({ email: 'a@example.edu', password: 'existing', role: 'admin' }).role);
+  assert.equal(validateAuth({ email: 'a@example.edu', password: 'existing', role: 'organizer' }).role, undefined);
 });
 
 test('network, invalid credentials, duplicate email and rate limits remain distinct', () => {

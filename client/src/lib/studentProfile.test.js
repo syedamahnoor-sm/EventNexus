@@ -41,7 +41,7 @@ test('in-memory drafts are scoped to identity and can be discarded on logout', (
 });
 test('profile destination is role-aware and PATCH retains the existing CSRF protocol', async () => {
   assert.equal(authDestination('/student/profile', 'student'), '/student/profile');
-  assert.equal(authDestination('/student/profile', 'organizer'), '/events');
+  assert.equal(authDestination('/student/profile', 'organizer'), '/organizer/dashboard');
   let writes = 0;
   const client = createAuthClient({ get: async () => ({ data: { csrfToken: 'a'.repeat(64) } }), patch: async (path, body, config) => { writes++; assert.equal(path, '/students/profile'); assert.equal(config.headers['X-CSRF-Token'].length, 64); assert.equal(body.version, 0); return { data: { user } }; } });
   assert.equal((await client.patch('/students/profile', profilePayload(profileValues(user), 0))).user.id, user.id); assert.equal(writes, 1);

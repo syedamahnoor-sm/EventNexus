@@ -1,39 +1,9 @@
 const Event = require("../models/Event");
+const { createEvent, updateEvent, deleteEvent, cancelEvent } = require("./eventManagementController");
 const mongoose = require("mongoose")
 
-const { createEventSchema, updateEventSchema, updateRecapSchema } = require("../validators/eventValidator");
+const { updateRecapSchema } = require("../validators/eventValidator");
 const { eventWindow } = require('../utils/eventLifecycle');
-
-const createEvent = async (req, res, next) => {
-    try {
-        // Step 1: Validate incoming request data
-        const result = createEventSchema.safeParse(req.body);
-
-        if (!result.success) {
-            return res.status(400).json({
-                message: "Invalid event data",
-                errors: result.error.flatten()
-            });
-        }
-
-        // Step 2: Create the event in MongoDB
-        const event = await Event.create({
-            ...result.data,
-            organizer: req.user._id
-        });
-
-        // Step 3: Return the created event
-        return res.status(201).json({
-            message: "Event created successfully",
-            event
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
-
-
 
 const getAllEvents = async (req, res, next) => {
     try {
@@ -220,139 +190,6 @@ const getEventById = async (req, res, next) => {
 
 
 
-const updateEvent = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-
-        // Validate event ID
-        if (!mongoose.isObjectIdOrHexString(id)) {
-            return res.status(400).json({
-                message: "Invalid event ID"
-            });
-        }
-
-        // Validate incoming update data
-        const result = updateEventSchema.safeParse(req.body);
-
-        if (!result.success) {
-            return res.status(400).json({
-                message: "Invalid update data",
-                errors: result.error.flatten()
-            });
-        }
-
-        const updates = result.data;
-
-        // Conditions required for every update
-        const filter = {
-            _id: id,
-            organizer: req.user._id,
-            status: "upcoming",
-            date: { $gt: new Date() }
-        };
-
-        // Capacity must not fall below current registrations
-        if (updates.capacity !== undefined) {
-            filter.registeredCount = {
-                $lte: updates.capacity
-            };
-        }
-
-        // Atomically check conditions and update
-        const updatedEvent = await Event.findOneAndUpdate(
-            filter,
-            { $set: updates },
-            {
-                new: true,
-                runValidators: true
-            }
-        );
-
-        if (!updatedEvent) {
-            // Determine why the update was rejected
-            const event = await Event.findById(id);
-
-            if (!event) {
-                return res.status(404).json({
-                    message: "Event not found"
-                });
-            }
-
-            if (!event.organizer.equals(req.user._id)) {
-                return res.status(403).json({
-                    message: "You can only update your own events"
-                });
-            }
-
-            if (event.status !== "upcoming" || event.date <= new Date()) {
-                return res.status(409).json({
-                    message: "Only future upcoming event details can be updated; past events support recap updates"
-                });
-            }
-
-            return res.status(409).json({
-                message: "Capacity cannot be lower than current registrations"
-            });
-        }
-
-        return res.status(200).json({
-            message: "Event updated successfully",
-            data: updatedEvent
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
-
-
-const deleteEvent = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-
-        if (!mongoose.isObjectIdOrHexString(id)) {
-            return res.status(400).json({
-                message: "Invalid event ID"
-            });
-        }
-
-        // Atomically delete only if all conditions match
-        const deletedEvent = await Event.findOneAndDelete({
-            _id: id,
-            organizer: req.user._id,
-            status: "upcoming",
-            registeredCount: 0
-        });
-
-        if (!deletedEvent) {
-            const event = await Event.findById(id);
-
-            if (!event) {
-                return res.status(404).json({
-                    message: "Event not found"
-                });
-            }
-
-            if (!event.organizer.equals(req.user._id)) {
-                return res.status(403).json({
-                    message: "You can only delete your own events"
-                });
-            }
-
-            return res.status(409).json({
-                message: "Event cannot be deleted in its current state"
-            });
-        }
-
-        return res.status(200).json({
-            message: "Event deleted successfully"
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
-
 const updateEventRecap = async (req, res, next) => {
     try {
         if (!mongoose.isObjectIdOrHexString(req.params.id)) return res.status(400).json({ message: 'Invalid event ID' });
@@ -372,6 +209,7 @@ const updateEventRecap = async (req, res, next) => {
 
 module.exports = {
     createEvent,
+    cancelEvent,
     getAllEvents,
     getEventById,
     updateEvent,

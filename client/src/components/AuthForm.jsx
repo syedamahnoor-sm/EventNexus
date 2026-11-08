@@ -3,7 +3,8 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
 import Arrow from './Arrow';
 import { useAuth } from '../auth/AuthContext';
-import { authDestination, authFeedback, validateAuth } from '../auth/authRules';
+import { authDestination, authFeedback, initialLoginRole, validateAuth } from '../auth/authRules';
+import LoginRoleSelector from './LoginRoleSelector';
 
 function PasswordField({ id, label, value, onChange, error, creating, hint }) {
   const [visible, setVisible] = useState(false);
@@ -14,7 +15,7 @@ export default function AuthForm({ registering = false }) {
   const auth = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [values, setValues] = useState({ name: '', email: location.state?.email || '', password: '', confirm: '' });
+  const [values, setValues] = useState(() => ({ name: '', email: location.state?.email || '', password: '', confirm: '', role: initialLoginRole(location.state) }));
   const [errors, setErrors] = useState({});
   const [feedback, setFeedback] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -33,6 +34,7 @@ export default function AuthForm({ registering = false }) {
     const { name, value } = event.target;
     setValues(current => ({ ...current, [name]: value }));
     if (errors[name]) setErrors(current => ({ ...current, [name]: undefined }));
+    if (name === 'role') setFeedback(null);
   }
   async function submit(event) {
     event.preventDefault();
@@ -51,9 +53,9 @@ export default function AuthForm({ registering = false }) {
       if (registering) {
         await auth.register({ ...credentials, name: values.name.trim() });
         setValues(current => ({ ...current, password: '', confirm: '' }));
-        navigate('/login', { replace: true, state: { email: credentials.email, registered: true, from } });
+        navigate('/login', { replace: true, state: { email: credentials.email, registered: true, role: 'student', from } });
       } else {
-        const data = await auth.login(credentials);
+        const data = await auth.login({ ...credentials, role: values.role });
         setValues(current => ({ ...current, password: '' }));
         navigate(authDestination(from, data.user.role), { replace: true });
       }
@@ -74,15 +76,16 @@ export default function AuthForm({ registering = false }) {
     <form ref={form} className="auth-form" noValidate onSubmit={submit} aria-busy={submitting}>
       {feedback && <div className="auth-error-summary" role="alert" tabIndex={-1} ref={errorSummary}>{feedback}</div>}
       <fieldset disabled={submitting || auth.pending} className="auth-fields"><legend className="sr-only">{registering ? 'Create your student account' : 'Your login details'}</legend>
+      {!registering && <LoginRoleSelector value={values.role} onChange={change} error={errors.role} />}
       {registering && <div className="auth-field"><label htmlFor="name">Your name</label><input id="name" name="name" autoComplete="name" value={values.name} onChange={change} required maxLength={100} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'name-error' : undefined} />{errors.name && <p className="auth-field-error" id="name-error">{errors.name}</p>}</div>}
       <div className="auth-field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} maxLength={254} value={values.email} onChange={change} required aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'email-error' : undefined} />{errors.email && <p className="auth-field-error" id="email-error">{errors.email}</p>}</div>
       <PasswordField id="password" label="Password" value={values.password} onChange={change} error={errors.password} creating={registering} hint={registering ? 'At least 8 characters. Longer passphrases are welcome (up to 72 UTF-8 bytes).' : undefined} />
       {registering && <PasswordField id="confirm" label="Confirm password" value={values.confirm} onChange={change} error={errors.confirm} creating />}
       </fieldset>
-      {registering && <p className="auth-account-note"><span>STUDENT ACCOUNT</span>Public signup is for students. Already an organizer? <Link to="/login" state={{ from }}>Log in with your existing account.</Link></p>}
-      <button className="button lime auth-submit" type="submit" disabled={disabled} aria-busy={submitting}>{auth.initializing ? 'Checking your session…' : submitting ? registering ? 'Creating your account…' : 'Logging you in…' : registering ? 'Create my account' : 'Log in'}<Arrow diagonal /></button>
+      {registering && <p className="auth-account-note"><span>STUDENT ACCOUNT</span>Public signup is for students. Already an organizer? <Link to="/login" state={{ from, role: 'organizer' }}>Log in with your existing account.</Link></p>}
+      <button className="button lime auth-submit" type="submit" disabled={disabled} aria-busy={submitting}>{auth.initializing ? 'Checking your session…' : submitting ? registering ? 'Creating your account…' : 'Logging you in…' : registering ? 'Create my account' : `Log in as ${values.role === 'organizer' ? 'Organizer' : 'Student'}`}<Arrow diagonal /></button>
       <p className="auth-session-note">{registering ? 'After signup, you’ll log in with your new credentials.' : 'Your session stays with this browser. Log out when using a shared device.'}</p>
     </form>
-    <div className="auth-switch"><span>{registering ? 'Already part of the story?' : 'A new face on campus?'}</span><Link to={registering ? '/login' : '/register'} state={{ from }}>{registering ? 'Log in' : 'Create an account'} <Arrow diagonal /></Link></div>
+    <div className="auth-switch"><span>{registering ? 'Already part of the story?' : 'A new face on campus?'}</span><Link to={registering ? '/login' : '/register'} state={{ from, role: values.role }}>{registering ? 'Log in' : 'Create an account'} <Arrow diagonal /></Link></div>
   </AuthLayout>;
 }

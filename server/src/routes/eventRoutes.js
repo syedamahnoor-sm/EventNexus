@@ -6,7 +6,8 @@ const {
     getEventById,
     updateEvent,
     deleteEvent,
-    updateEventRecap
+    updateEventRecap,
+    cancelEvent
 } = require("../controllers/eventController");
 const requireAuth = require("../middleware/requireAuth");
 const requireRole = require("../middleware/requireRole");
@@ -27,6 +28,7 @@ router.post(
 router.patch(
     '/:id/recap', requireAuth, requireRole('organizer'), updateEventRecap
 );
+router.post('/:id/cancel', requireAuth, requireRole('organizer'), cancelEvent);
 router.patch(
     "/:id",
     requireAuth,

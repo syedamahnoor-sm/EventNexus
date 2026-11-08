@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
 import OrganizerDashboard from './pages/OrganizerDashboard';
+import OrganizerEventEditor from './pages/OrganizerEventEditor';
 import EventDetails from "./pages/EventDetails";
 import EventRegistrationPage from './pages/EventRegistrationPage';
 import StudentDashboard from './pages/StudentDashboard';
@@ -34,6 +35,8 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/student/profile" element={<ProtectedRoute role="student"><StudentProfile /></ProtectedRoute>} />
+                <Route path="/organizer/events/new" element={<ProtectedRoute role="organizer"><OrganizerEventEditor /></ProtectedRoute>} />
+                <Route path="/organizer/events/:id/edit" element={<ProtectedRoute role="organizer"><OrganizerEventEditor /></ProtectedRoute>} />
                 <Route
                     path="/student/dashboard"
                     element={<ProtectedRoute role="student"><StudentDashboard /></ProtectedRoute>}

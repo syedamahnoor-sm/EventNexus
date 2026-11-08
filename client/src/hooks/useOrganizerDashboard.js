@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../api/axios';
 import { useAuth } from '../auth/AuthContext';
 import { subscribeRegistrationChange } from '../lib/registrationEvents';
+import { subscribeEventChange } from '../lib/eventChanges';
 
 export default function useOrganizerDashboard({ view, page }) {
   const { user } = useAuth();
@@ -28,6 +29,7 @@ export default function useOrganizerDashboard({ view, page }) {
     return () => { window.removeEventListener('focus', check); document.removeEventListener('visibilitychange', check); };
   }, [refresh]);
   useEffect(() => subscribeRegistrationChange(null, refresh), [refresh]);
+  useEffect(() => subscribeEventChange(null, refresh), [refresh]);
   // Keep the shared overview/filters mounted during query changes, preserving focus.
   const data = result.data;
   const nextDate = data?.data.next?.date;

@@ -3,6 +3,7 @@ import api from '../api/axios';
 import { AuthContext } from './AuthContext';
 import { createAuthClient } from './authClient';
 import { clearOtherProfileDrafts } from '../lib/studentProfile';
+import { clearOtherEventDrafts } from '../lib/eventManagement';
 
 const client = createAuthClient(api);
 let sessionRequest;
@@ -23,6 +24,7 @@ export default function AuthProvider({ children }) {
   const channel = useRef(null);
   const lastCheck = useRef(0);
   useEffect(() => { clearOtherProfileDrafts(session.user?.id); }, [session.user?.id]);
+  useEffect(() => { if (session.status === 'ready' && session.user) clearOtherEventDrafts(session.user.role === 'organizer' ? session.user.id : null); }, [session.status, session.user]);
   const restore = useCallback(async () => {
     const version = epoch.current;
     try {
@@ -71,7 +73,7 @@ export default function AuthProvider({ children }) {
     try {
       const data = await client.post(`/auth/${operation}`, payload);
       if (operation === 'login') setSession({ status: 'ready', user: data.user });
-      if (operation === 'logout') setSession({ status: 'ready', user: null });
+      if (operation === 'logout') { clearOtherEventDrafts(null); setSession({ status: 'ready', user: null }); }
       if (operation !== 'register') channel.current?.postMessage('changed');
       lastCheck.current = Date.now();
       return data;

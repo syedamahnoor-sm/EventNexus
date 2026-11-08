@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import api from '../api/axios';
+import { subscribeEventChange } from '../lib/eventChanges';
 
 export default function useEvents({ search = '', category = '', period = '', scope = 'upcoming', status = scope === 'past' ? '' : 'upcoming', sort = 'soonest', page = 1, limit = 12 } = {}) {
   const [state, setState] = useState({ events: [], pagination: { total: 0, totalPages: 0 }, loading: true, error: false });
   const [retryKey, setRetryKey] = useState(0);
+  const retry = useCallback(() => setRetryKey(value => value + 1), []);
+  useEffect(() => subscribeEventChange(null, retry), [retry]);
   const key = JSON.stringify({ search, category, period, scope, status, sort, page, limit, retryKey });
   useEffect(() => {
     const controller = new AbortController();
@@ -19,5 +22,5 @@ export default function useEvents({ search = '', category = '', period = '', sco
     }, search ? 300 : 0);
     return () => { clearTimeout(timer); controller.abort(); };
   }, [key, search]);
-  return { ...state, loading: state.key !== key || state.loading, retry: () => setRetryKey(value => value + 1) };
+  return { ...state, loading: state.key !== key || state.loading, retry };
 }

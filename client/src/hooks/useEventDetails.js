@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../api/axios';
 import { subscribeRegistrationChange } from '../lib/registrationEvents';
+import { subscribeEventChange } from '../lib/eventChanges';
 
 export default function useEventDetails(id) {
   const [version, setVersion] = useState(0);
   const [result, setResult] = useState({ event: null, error: null, version: -1 });
   const refresh = useCallback(() => setVersion(value => value + 1), []);
   useEffect(() => subscribeRegistrationChange(id, refresh), [id, refresh]);
+  useEffect(() => subscribeEventChange(id, refresh), [id, refresh]);
   const valid = /^[a-f\d]{24}$/i.test(id || '');
   useEffect(() => {
     if (!valid) return;

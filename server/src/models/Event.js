@@ -27,6 +27,10 @@ const eventSchema = new mongoose.Schema(
 
         imageAlt: { type: String, trim: true, maxlength: 200 },
 
+        // Optional, server-owned creation recovery metadata; never public event content.
+        creationKey: { type: String, select: false, match: /^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i },
+        creationFingerprint: { type: String, select: false, match: /^[a-f\d]{64}$/ },
+
         recap: { type: String, trim: true, maxlength: 10000 },
         highlights: {
             type: [{ type: String, trim: true, maxlength: 240, required: true }], default: undefined,
@@ -105,6 +109,7 @@ const eventSchema = new mongoose.Schema(
 );
 
 eventSchema.index({ organizer: 1, date: 1 });
+eventSchema.index({ organizer: 1, creationKey: 1 }, { unique: true, partialFilterExpression: { creationKey: { $type: 'string' } } });
 eventSchema.index({ date: 1 });
 eventSchema.index({
     category: 1,

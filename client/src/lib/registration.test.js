@@ -25,5 +25,5 @@ test('submission whitelists only attendee fields and does not transmit seat coun
 test('login can restore a student registration destination but cannot grant organizer access', () => {
   const destination = '/events/1234567890abcdef12345678/register';
   assert.equal(authDestination(destination, 'student'), destination);
-  assert.equal(authDestination(destination, 'organizer'), '/events');
+  assert.equal(authDestination(destination, 'organizer'), '/organizer/dashboard');
 });

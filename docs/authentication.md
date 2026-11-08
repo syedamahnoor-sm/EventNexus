@@ -1,6 +1,6 @@
 # EventNexus authentication
 
-The Login and Register pages use the existing Express session architecture. No backend authentication endpoints, roles, cookie options, authorization, CSRF checks or session-store settings were changed. No dependencies were added.
+The Login and Register pages use the existing Express session architecture. Login now includes an accessible Student / Organizer selector checked against the account's stored role before session creation. Cookie options, CSRF checks, session storage, and role authority remain unchanged. No dependencies were added. See [role login and development organizer notes](role-login.md) for the refinement's account details and validation.
 
 ## Contracts and session state
 
@@ -9,7 +9,7 @@ The Login and Register pages use the existing Express session architecture. No b
 | `GET /api/auth/me` | Restore the current user on initialization; recheck on window focus after five seconds or on a cross-tab session change. A 401 is an anonymous session; a network/server failure is an unavailable check, not a guest login. |
 | `GET /api/auth/csrf-token` | Obtain the current session's CSRF token before an authentication mutation. |
 | `POST /api/auth/register` | Submit only `name`, normalized `email` and `password`. Creates a **student** account, without authenticating. Confirmation is validated locally and never sent. |
-| `POST /api/auth/login` | Submit normalized `email` and `password`. Accept the real user and freshly rotated CSRF token. |
+| `POST /api/auth/login` | Submit normalized `email`, `password`, and selected `role`. The server verifies credentials and role before rotating the session. Accept the actual user and freshly rotated CSRF token. Older API clients may omit role; it never assigns privileges. |
 | `POST /api/auth/logout` | Destroy the server session, then clear frontend user state and the in-memory CSRF token on confirmed success. An ambiguous failure is reported rather than falsely claiming logout. |
 
 `AuthProvider` exposes user, role, authenticated, initializing, status, pending, refresh, login, register and logout through `useAuth`. Initialization shares one in-flight request, including React StrictMode effect replay. Navbar, route guards and the existing Event Details registration panel consume that state rather than each requesting `/auth/me`. Existing event registration logic remains in place; no new registration workflow was implemented.
@@ -26,9 +26,9 @@ The forms distinguish invalid credentials, duplicate email, backend field valida
 
 Guests reaching `/student/dashboard` or `/organizer/dashboard` are redirected to Login with the intended path preserved. Role mismatch shows an access explanation and a link to the user's own account; it does not render the other role's content or create a redirect loop. Return destinations are limited to known internal routes and the matching role's workspace.
 
-Dashboard routes explicitly show a signed-in account confirmation and a future-milestone notice. They are **not dashboards**. Navigation labels are Student account / Organizer account, with Logout. Public signup does not expose a role selector because the backend's strict registration contract creates students only. Existing organizers can log in; organizer provisioning remains an administrative/backend responsibility.
+Both roles have dedicated protected dashboards. Navigation preserves the student avatar menu and the organizer workspace entry. Public signup does not expose a role selector because the backend's strict registration contract creates students only. Existing organizers log in using the Organizer option; provisioning remains an administrative/backend responsibility. A valid password with the wrong login selection returns `403 ROLE_MISMATCH` before session regeneration or user assignment; existing valid sessions are not replaced by failed attempts.
 
-Loading and unavailable session checks have separate UI states. Authenticated visitors to Login/Register continue to a safe intended destination or Explore. Login/Register preserve the destination between each other. After signup the user sees a success message on Login, with their email prefilled and no password retained across pages.
+Loading and unavailable session checks have separate UI states. After login, students default to `/student/dashboard` and organizers to `/organizer/dashboard`. A known, role-authorized return destination takes priority. Login/Register preserve that destination between each other. After student signup the user sees a success message on Login with Student selected, their email prefilled, and no password retained across pages.
 
 ## Design and accessibility
 
