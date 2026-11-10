@@ -183,7 +183,7 @@ Both directories contain npm lockfiles. There is no root package manifest or com
 
 Create `server/.env` from [server/.env.example](server/.env.example), supplying your own development database URI and a long random session secret. See [Environment configuration](#environment-configuration).
 
-The frontend defaults to `http://localhost:5000/api`. Create `client/.env` with `VITE_API_URL` only when changing that location, then restart Vite. Never place server secrets in `VITE_` variables.
+Local development defaults to `http://localhost:5000/api`. Production builds require an explicit HTTPS `VITE_API_URL` ending with `/api`; the current Vercel value is `https://eventnexus-api-441o.onrender.com/api`. Restart Vite locally or rebuild/redeploy after changing it. Never place server secrets in `VITE_` variables. See [Vercel/Render deployment configuration](docs/production-deployment.md).
 
 ### 6. Connect MongoDB
 
@@ -242,7 +242,8 @@ CLOUDINARY_API_SECRET=<api-secret>
 | --- | --- | --- |
 | `MONGO_URI` | Required | Mongoose and MongoDB session-store connection. |
 | `SESSION_SECRET` | Required | Session signing secret; startup rejects a missing value. |
-| `CLIENT_URL` | Set for frontend origin | Credentialed CORS origin; default `http://localhost:5173`. |
+| `CLIENT_URL` | Required in production | Exact credentialed CORS origin, no trailing slash; local default `http://localhost:5173`. Production: `https://event-nexus-one.vercel.app`. |
+| `TRUST_PROXY_HOPS` | Set for hosted proxy | `0` locally; `1` for the direct Render HTTPS edge. Bounded numeric trust, not blanket proxy trust. |
 | `PORT` | Optional; default `5000` | API listening port; integer from 1 to 65535. |
 | `NODE_ENV` | Set explicitly | `production` enables Secure cookies; development tools also check this value. |
 | `CLOUDINARY_CLOUD_NAME` | Optional group | Managed photo storage cloud name. |
@@ -255,7 +256,7 @@ CLOUDINARY_API_SECRET=<api-secret>
 VITE_API_URL=http://localhost:5000/api
 ```
 
-`VITE_API_URL` is the public API base URL, including `/api`; the default is shown above.
+`VITE_API_URL` is the public API base URL, including `/api` once. The example above is for local development; production requires a non-local HTTPS value, such as `https://eventnexus-api-441o.onrender.com/api`, and a new build.
 
 **Tooling only:** `EVENTNEXUS_TEST_MONGO_URI` supplies the isolated local integration-test replica set. Seed/migration commands use explicit guards such as `EVENTNEXUS_SEED_ALLOW` and `EVENTNEXUS_SEED_DB`; these are not application runtime requirements. Consult the lifecycle/seed guides before using maintenance commands.
 
@@ -324,7 +325,7 @@ See the [complete API reference](docs/api.md) for payloads, query bounds, requir
 - **CSRF:** cryptographically generated session-bound tokens with timing-safe comparison on non-safe requests.
 - **Validation:** Zod schemas, Mongoose validation, bounded request bodies, allowed-field checks, and validated query parameters.
 - **Rate limiting:** 20 authentication mutation requests per 15 minutes; safe GET/HEAD/OPTIONS requests are exempt. Photo changes have a separate 10-per-15-minute limit.
-- **Cookies and browser policy:** HttpOnly, SameSite=Lax cookies with a 24-hour lifetime; Secure cookies in production; Helmet headers and explicit credentialed CORS origin.
+- **Cookies and browser policy:** HttpOnly cookies with a 24-hour lifetime; SameSite=Lax for local development and Secure/SameSite=None in production for Vercel-to-Render requests; Helmet headers and exact credentialed CORS origin. Browser third-party-cookie policy can still block this cross-site arrangement.
 - **Capacity consistency:** enrollment reserves a seat and creates its registration transactionally. Cancellation releases a seat, records its transition, and writes an outbox fact atomically. A partial unique index permits one active registration per student/event.
 - **Historical consistency:** saved attendee/answer snapshots survive profile/question changes; version checks detect conflicting edits.
 
@@ -405,7 +406,7 @@ The implementation is authoritative. Some documents describe earlier milestones;
 - Events have a scheduled start date without an end time/duration. Past registrations and archive entries do not establish attendance or actual completion.
 - Saved recaps can be displayed and updated through the API, but there is no organizer recap editor.
 - Existing databases may require the lifecycle index migration. Previously deleted registration records cannot be reconstructed.
-- Production hosting and cross-site cookie/proxy arrangements require further deployment work; no live deployment is documented here.
+- Current Vercel/Render URLs, required environment settings, proxy/cookie configuration and post-deploy checks are documented in [Production deployment](docs/production-deployment.md). Hosting dashboard values and live browser session acceptance require owner verification after redeployment.
 
 ## Future enhancements
 

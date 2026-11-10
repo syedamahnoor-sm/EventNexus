@@ -13,6 +13,8 @@ npm run lint
 npm run build
 ```
 
+Production builds now require `VITE_API_URL` explicitly, for example `$env:VITE_API_URL='https://eventnexus-api-441o.onrender.com/api'` in PowerShell before `npm.cmd run build`. The localhost fallback applies only to Vite development. See [production configuration](production-deployment.md).
+
 Backend tests cover validators/models, ownership query construction, role/session contracts, upload decoding and storage signing, lifecycle/index safeguards, transaction propagation, seeds/archive fixtures, port configuration and live HTTP rate-limit/cache behavior. Offline tests do not read `.env` or connect to development MongoDB. Frontend tests exercise auth/CSRF transport, redirects, lifecycle/availability, dashboard calculations, profiles, drafts, questions, participants and uncertain requests. They are helper tests, not rendered-component tests.
 
 The backend has no lint/build script. Validate its JavaScript syntax with `node --check <file>` for each tracked `.js`/`.cjs` file under `server/` (excluding dependencies). Use `npm audit` in each package for the advisory registry check; this requires network access. The patched minimatch override is shared by ESLint and nodemon; rerun lint and a nodemon configuration smoke check after updating it. Never use `npm audit fix --force` blindly.

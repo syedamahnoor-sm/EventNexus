@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
+const { clientOrigin, proxyHops } = require('./config/deployment');
 
 const authRoutes = require("./routes/authRoutes");
 const errorHandler = require("./middleware/errorHandler");
@@ -16,12 +17,14 @@ const {
 const app = express();
 
 app.disable("x-powered-by");
+// Explicit hop count, never blanket proxy trust. Set to 1 behind Render's edge.
+app.set('trust proxy', proxyHops());
 // Session-dependent responses must never be reused after logout or account changes.
 app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 
 app.use(helmet());
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: clientOrigin(),
     credentials: true
 }));
 const standardJson = express.json({ limit: '10kb' });

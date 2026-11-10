@@ -1,5 +1,6 @@
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
+const { sessionCookieOptions } = require('./deployment');
 
 const createSessionMiddleware = () => {
     if (!process.env.SESSION_SECRET) {
@@ -21,9 +22,7 @@ const createSessionMiddleware = () => {
         }),
 
         cookie: {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            ...sessionCookieOptions(),
             maxAge: 24 * 60 * 60 * 1000
         }
     });

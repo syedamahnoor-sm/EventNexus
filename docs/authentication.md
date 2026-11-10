@@ -1,5 +1,7 @@
 # EventNexus authentication
 
+Deployment update: production now uses Secure/SameSite=None cookies for the Vercel/Render cross-site arrangement, and configurable bounded proxy trust. Local cookies remain SameSite=Lax. See [production configuration and current live observations](production-deployment.md); earlier milestone descriptions below predate this change.
+
 The Login and Register pages use the existing Express session architecture. Login now includes an accessible Student / Organizer selector checked against the account's stored role before session creation. Cookie options, CSRF checks, session storage, and role authority remain unchanged. No dependencies were added. See [role login and development organizer notes](role-login.md) for the refinement's account details and validation.
 
 ## Contracts and session state

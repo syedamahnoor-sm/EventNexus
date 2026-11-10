@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("node:crypto");
 const publicUser = require('../utils/publicUser');
+const { sessionCookieOptions } = require('../config/deployment');
 
 const registerUser = async (req, res) => {
     try {
@@ -169,12 +170,7 @@ const logoutUser = (req, res) => {
             });
         }
 
-        res.clearCookie("eventnexus.sid", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/"
-        });
+        res.clearCookie("eventnexus.sid", sessionCookieOptions());
 
         return res.status(200).json({
             message: "Logout successful"
