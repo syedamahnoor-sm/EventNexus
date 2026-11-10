@@ -122,7 +122,7 @@ const getMyRegistrations = async (req, res, next) => {
                 select: "title description category location date capacity registeredCount status imageUrl imageAlt",
                 populate: {
                     path: "organizer",
-                    select: "name email"
+                    select: "name"
                 }
             })
             .sort({ createdAt: -1 })

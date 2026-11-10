@@ -16,6 +16,8 @@ const {
 const app = express();
 
 app.disable("x-powered-by");
+// Session-dependent responses must never be reused after logout or account changes.
+app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 
 app.use(helmet());
 app.use(cors({
@@ -24,7 +26,9 @@ app.use(cors({
 }));
 const standardJson = express.json({ limit: '10kb' });
 const eventJson = express.json({ limit: '64kb' });
+const recapJson = express.json({ limit: '128kb' });
 app.use((req, res, next) => {
+    if (req.method === 'PATCH' && /^\/api\/events\/[^/]+\/recap\/?$/.test(req.path)) return recapJson(req, res, next);
     const eventWrite = (req.method === 'POST' && /^\/api\/events\/?$/.test(req.path)) || (req.method === 'PATCH' && /^\/api\/events\/[^/]+\/?$/.test(req.path)) || (req.method === 'POST' && /^\/api\/events\/[^/]+\/register\/?$/.test(req.path));
     return (eventWrite ? eventJson : standardJson)(req, res, next);
 });
@@ -41,6 +45,7 @@ const authLimiter = rateLimit({
     limit: 20,
     standardHeaders: "draft-8",
     legacyHeaders: false,
+    skip: req => ['GET', 'HEAD', 'OPTIONS'].includes(req.method),
     message: {
         message: "Too many requests. Please try again later."
     }

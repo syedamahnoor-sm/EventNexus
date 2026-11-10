@@ -28,7 +28,7 @@ async function run({ inspectBrowser } = {}) {
         await mongoose.connect(process.env.MONGO_URI, { autoIndex: false, serverSelectionTimeoutMS: 10000 });
         assert.equal(mongoose.connection.name, database); assert.equal((await mongoose.connection.db.listCollections().toArray()).length, 0);
         await mongoose.connection.db.collection('qa_owner').insertOne({ token }); owned = true;
-        await Registration.createCollection(); await Registration.collection.createIndex({ student: 1, event: 1 }, { unique: true }); await User.createIndexes(); await Outbox.createIndexes();
+        await Registration.createCollection(); await Registration.collection.createIndex({ student: 1, event: 1 }, { unique: true }); await User.createIndexes(); await Event.createIndexes(); await Outbox.createIndexes();
         const users = await User.create(['organizer', 'organizer', 'student', 'student'].map((role, i) => ({ name: ['Morgan Reed', 'Another Organizer', 'Rowan Student', 'Casey Student'][i], email: `lifecycle-${token}-${i}@eventnexus-seed.invalid`, password: bcrypt.hashSync(password, 12), role })));
         await start();
         const clients = [];
@@ -83,12 +83,13 @@ async function run({ inspectBrowser } = {}) {
         assert.equal((await Event.findById(competing._id)).registeredCount, 1); assert.equal(await Registration.countDocuments({ event: competing._id, ...ACTIVE }), 1);
         const past = (await request(a, 'POST', '/events', payload('Past Boundary Fixture'), 201)).event; const pastReg = (await request(s, 'POST', '/events/' + past._id + '/register', { attendee }, 201)).data; await Event.updateOne({ _id: past._id }, { $set: { date: new Date(0) } }); await request(a, 'POST', '/events/' + past._id + '/registrations/' + pastReg._id + '/cancel', { confirmed: true, reason: 'Past registrations cannot be cancelled.' }, 409); await request(s, 'DELETE', '/events/' + past._id + '/register', { registrationId: pastReg._id }, 409);
         const closed = (await request(a, 'POST', '/events', payload('Cancelled Event Fixture'), 201)).event; const closedReg = (await request(s, 'POST', '/events/' + closed._id + '/register', { attendee }, 201)).data; await request(a, 'POST', '/events/' + closed._id + '/cancel', {}, 200, a.csrf, { 'X-Event-Version': '0' }); await request(a, 'POST', '/events/' + closed._id + '/registrations/' + closedReg._id + '/cancel', { confirmed: true, reason: 'The event is no longer open.' }, 409);
+        await require('./handover-journeys.integration.cjs')({ base, request, users, clients, password, event, first, models: { User, Event, Registration } });
         console.log('PASS real local MongoDB/API: verified index replacement without document rewrites; legacy uniqueness; reason/confirmation/roles/ownership/CSRF; repeated and concurrent cancellations; re-registration and stale references; seat/enrollment races; outbox failure rollback; active counts/filters/pages; unchanged answer snapshots; student privacy; past/cancelled-event guards');
         if (inspectBrowser) { await stop(); await start(); await inspectBrowser({ base, users, clients, event: await Event.findById(event._id).lean(), registration: fourth, password, request, models: { Event, Registration, Outbox } }); }
         return { passed: true };
     } finally {
         await stop();
-        if (owned) { assert.equal(mongoose.connection.name, database); assert.equal((await mongoose.connection.db.collection('qa_owner').findOne({ token }))?.token, token); await mongoose.connection.dropDatabase(); console.log('PASS exact local fixture cleanup: unique test database removed; Atlas and development seed records never connected or modified'); }
+        if (owned) { assert.equal(mongoose.connection.name, database); assert.equal((await mongoose.connection.db.collection('qa_owner').findOne({ token }))?.token, token); console.log('QA fixtures retained in isolated database ' + database + '; no database or development records deleted.'); }
         await mongoose.disconnect();
     }
 }

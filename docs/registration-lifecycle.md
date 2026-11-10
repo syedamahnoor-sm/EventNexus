@@ -89,7 +89,7 @@ $env:EVENTNEXUS_TEST_MONGO_URI='mongodb://127.0.0.1:27179/?replicaSet=rs0&direct
 npm run test:registration-lifecycle:integration
 ```
 
-That test never reads `.env`; it creates a unique `eventnexus_lifecycle_qa_*` database, verifies a private ownership marker, and removes only that test database. Atlas/development records are never used for its race tests. The intentionally injected outbox error produces an expected 500 in the test log; rollback assertions verify the active seat remains intact.
+That test never reads `.env`; it creates a unique `eventnexus_lifecycle_qa_*` database and verifies a private ownership marker. Final handover QA retains that isolated database for inspection instead of deleting it. Atlas/development records are never used for its race tests. The intentionally injected outbox error produces an expected 500 in the test log; rollback assertions verify the active seat remains intact. See the current [testing guide](testing.md).
 
 No application dependencies were added. MongoDB 8 was used in a temporary Docker test container; no production storage architecture changed.
 

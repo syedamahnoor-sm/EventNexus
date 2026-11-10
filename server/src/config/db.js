@@ -7,7 +7,7 @@ const connectDB = async ({ throwOnError = false } = {}) => {
     } catch (error) {
         // CLI callers can close resources and report a sanitized failure without leaking URI details.
         if (throwOnError) throw new Error('MongoDB connection failed; connection details suppressed.');
-        console.error("MongoDB connection failed:", error.message);
+        console.error("MongoDB connection failed; check server configuration and database availability.");
         process.exit(1);
     }
 };

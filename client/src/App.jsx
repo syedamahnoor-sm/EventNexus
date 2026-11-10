@@ -4,6 +4,7 @@ import {
     Routes,
     Route
 } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 import MotionShell from "./components/MotionShell";
 import Navbar from "./components/Navbar";
@@ -33,6 +34,7 @@ export default function App() {
             <Navbar />
 
             <MotionShell><Routes>
+                <Route path="*" element={<main id="main" className="account-state wrap" tabIndex={-1}><p className="eyebrow">OFF THE NOTICEBOARD / 404</p><h1>This page isn’t on the map.</h1><p>Check the address or find your next campus experience.</p><Link className="button lime" to="/events">Explore events</Link></main>} />
                 <Route path="/" element={<Home />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/events/past" element={<PreviousEvents />} />

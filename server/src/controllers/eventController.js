@@ -7,6 +7,10 @@ const { eventWindow } = require('../utils/eventLifecycle');
 
 const getAllEvents = async (req, res, next) => {
     try {
+        const allowed = ['search', 'category', 'period', 'status', 'scope', 'sort', 'page', 'limit'];
+        if (Object.entries(req.query).some(([key, value]) => !allowed.includes(key) || typeof value !== 'string')) {
+            return res.status(400).json({ message: 'Invalid event query parameters' });
+        }
         const {
             search,
             category,
@@ -170,7 +174,7 @@ const getEventById = async (req, res, next) => {
         }
 
         const event = await Event.findById(id)
-            .populate("organizer", "name email")
+            .populate("organizer", "name")
             .lean();
 
         if (!event) {
@@ -199,7 +203,7 @@ const updateEventRecap = async (req, res, next) => {
         const event = await Event.findOneAndUpdate({
             _id: req.params.id, organizer: req.user._id,
             status: { $in: ['upcoming', 'completed'] }, date: { $lte: new Date() },
-        }, { $set: result.data }, { new: true, runValidators: true });
+        }, { $set: result.data }, { returnDocument: 'after', runValidators: true });
         if (event) return res.status(200).json({ message: 'Event recap updated', data: event });
         const existing = await Event.findById(req.params.id).select('organizer');
         if (!existing) return res.status(404).json({ message: 'Event not found' });

@@ -314,7 +314,7 @@ Protected requests require the session cookie. Every non-safe method also requir
 | POST | `/api/students/profile/photo` | Upload raw JPEG, PNG, or WebP body | Student; configured storage |
 | DELETE | `/api/students/profile/photo` | Remove photo | Student; configured storage |
 
-This is an overview, not a complete payload reference. Event writes use version headers where applicable; custom answers use a question version. Stale requests can be rejected instead of overwriting data. See the feature contracts below.
+See the [complete API reference](docs/api.md) for payloads, query bounds, required version headers and error codes. Event writes use version headers where applicable; custom answers use a question version. Stale requests can be rejected instead of overwriting data.
 
 ## Security
 
@@ -376,11 +376,11 @@ $env:EVENTNEXUS_TEST_MONGO_URI='mongodb://127.0.0.1:27179/?replicaSet=rs0&direct
 npm run test:registration-lifecycle:integration
 ```
 
-The example port must match your local instance. The harness rejects remote hosts and credentials, never reads the project's `.env`, creates a unique `eventnexus_lifecycle_qa_*` database, and removes that database after ownership checks. It exercises migration, roles/ownership/CSRF, cancellation/enrollment races, rollback, and retained snapshots. See [Registration lifecycle](docs/registration-lifecycle.md).
+The example port must match your local instance. The harness rejects remote hosts and credentials, never reads the project's `.env`, and creates a unique `eventnexus_lifecycle_qa_*` database. It retains those isolated fixtures for inspection and never drops a database. It exercises migration, roles/ownership/CSRF, cancellation/enrollment races, rollback, profiles and retained snapshots. See the [testing guide](docs/testing.md).
 
 The backend also exposes `npm run test:browser`, using the same test URI and lifecycle harness. It starts Vite on localhost port 5179 and headless Chrome, and writes local captures under `.cache/`. The runner currently hardcodes Chrome's Windows installation path (`C:\Program Files\Google\Chrome\Application\chrome.exe`), so it requires that installation and an available port 5179; it is not a portable browser-test setup.
 
-Feature documents record historical API/browser verification. Their results are not a claim that checks were rerun for this documentation update; no current test-pass counts are asserted here.
+Feature documents record historical API/browser verification. See the [final handover report](docs/final-handover.md) for the current validation record and [testing guide](docs/testing.md) for repeatable commands and fixture safety.
 
 ## Technical documentation
 
@@ -421,7 +421,7 @@ EventNexus was developed as a software engineering internship project. It demons
 
 ## License
 
-The repository includes an [MIT License](LICENSE), copyright 2026 Syeda Mahnoor. The backend package manifest separately declares `ISC`; its metadata is inconsistent with the root license and should be reconciled by the maintainer. Event-photo source credits are documented in [Event photography](docs/event-photography.md).
+The repository includes an [MIT License](LICENSE), copyright 2026 Syeda Mahnoor. The backend package metadata also declares MIT. Event-photo source credits are documented in [Event photography](docs/event-photography.md).
 
 ## Project summary
 

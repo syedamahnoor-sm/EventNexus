@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test": "node --test src/lib/*.test.js src/auth/*.test.js",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
@@ -17,6 +18,7 @@
     "react-router-dom": "^7.18.5",
     "tailwindcss": "^4.3.3"
   },
+  "overrides": { "minimatch": "^11.0.1" },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.3.0",

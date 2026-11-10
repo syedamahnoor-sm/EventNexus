@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test scripts/*.test.js scripts/seed-events/*.test.js",
     "seed:events": "node scripts/seed-events.js seed",
     "seed:events:cleanup": "node scripts/seed-events.js cleanup",
     "seed:events:verify": "node scripts/seed-events.js verify",
@@ -26,13 +26,14 @@
     "test:participants": "node --test scripts/participants.test.js",
     "test:registration-lifecycle": "node --test scripts/registration-lifecycle.test.js",
     "test:registration-lifecycle:integration": "node scripts/registration-lifecycle.integration.cjs",
+    "test:browser": "node scripts/browser.integration.cjs",
     "registrations:lifecycle:check": "node scripts/migrate-registration-lifecycle.js --check",
     "registrations:lifecycle:apply": "node scripts/migrate-registration-lifecycle.js --apply",
     "avatars:cleanup": "node scripts/cleanup-avatars.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -44,8 +45,9 @@
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
     "mongoose": "^9.11.4",
-    "nodemon": "^3.1.14",
     "sharp": "^0.35.5",
     "zod": "^4.6.7"
-  }
+  },
+  "devDependencies": { "nodemon": "^3.1.14" },
+  "overrides": { "minimatch": "^11.0.1" }
 }
